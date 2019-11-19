@@ -1,0 +1,19 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DSplit", "DSplit.vcxproj", "{453C4298-C5D8-4AA6-8D98-62CEA962BCFE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{453C4298-C5D8-4AA6-8D98-62CEA962BCFE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{453C4298-C5D8-4AA6-8D98-62CEA962BCFE}.Debug|Win32.Build.0 = Debug|Win32
+		{453C4298-C5D8-4AA6-8D98-62CEA962BCFE}.Release|Win32.ActiveCfg = Release|Win32
+		{453C4298-C5D8-4AA6-8D98-62CEA962BCFE}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
