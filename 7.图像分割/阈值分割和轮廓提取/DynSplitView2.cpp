@@ -176,14 +176,13 @@ void CDynSplitView2::OnLunKuoTiQu()
     clearmem();
     if(CDibNew1->m_pBitmapInfoHeader->biBitCount<9)
     {
-        CDibNew1->Lunkuotiqu();             //调用轮廓提取处理函数
+        CDibNew1->Lunkuotiqu(70);             //调用轮廓提取处理函数
         Invalidate();
     }
     else
     {
+        CDibNew1->Lunkuotiqu2(140);
         Invalidate();
-        MessageBox("在右图单击鼠标左键选取种子点");
-        state=3;
     }
 }
 

@@ -39,78 +39,113 @@ void BingXingBianJieDib::RgbToGray()
     }
 }
 
-///***************************************************************/           
-/*函数名称：Lunkuotiqu()                                      
-/*函数类型：void                                     
-/*功能：对图像进行轮廓提取。            
-/***************************************************************/ 
-void BingXingBianJieDib::Lunkuotiqu()
+void BingXingBianJieDib::Lunkuotiqu2(int T)
 {
-    LPBYTE  p_data ;     //原图数据区指针
-    int wide,height;    //原图长、宽
-    // 指向源图像的指针
-    LPBYTE    lpSrc;
-    // 指向缓存图像的指针
-    LPBYTE    lpDst;    
-    // 指向缓存DIB图像的指针
-    LPBYTE    temp;
-    //循环变量
-    long i;
-    long j;
-    unsigned char n1,n2,n3,n4,n5,n6,n7,n8;
-    //像素值
-    unsigned char pixel;
-    // 暂时分配内存，以保存新图像
-    p_data=GetData();
-    wide=GetWidth();
-    height=GetHeight();
-    temp = new BYTE[wide * height];
-    for (j=0;j<height;j++)
-    {
-        for(i=0;i<wide;i++)
-        {
-            lpSrc = (LPBYTE)p_data + wide * j + i;
-            if(*lpSrc>127)
-                *lpSrc=255;
+    this->RgbToGray();
+    //this->Lunkuotiqu(T);
+
+    int width = this->GetWidth(); // 原图宽度
+    int height = this->GetHeight(); // 原图高度
+    int lineBytes = this->GetDibWidthBytes(); // 原图 4 字节对齐后的宽度
+    int size = lineBytes * height;
+    LPBYTE p_data = this->GetData (); //原图数据区指针
+    LPBYTE p_temp = new BYTE[size];
+    memset(p_temp, 255, size);
+
+    // 二值化
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < lineBytes; x++) {
+            int index = lineBytes * y + x;
+            if (p_data[index] > T)
+                p_data[index] = 255;
             else
-                *lpSrc=0;
+                p_data[index] = 0;
         }
     }
-    // 初始化新分配的内存，设定初始值为255
-    memset(temp,  255, wide * height);
-    for(j = 1; j <height-1; j++)
-    {
-        for(i = 1;i <wide-1; i++)
-        {
-            // 指向源图像倒数第j行，第i个象素的指针            
-            lpSrc = (LPBYTE)p_data + wide * j + i;
-            // 指向目标图像倒数第j行，第i个象素的指针            
-            lpDst = (LPBYTE)temp + wide * j + i;
-            //取得当前指针处的像素值，注意要转换为unsigned char型
-            pixel = (unsigned char)*lpSrc;
-            if(pixel == 0)
-            {
-                *lpDst = (unsigned char)0;
-                n1 = (unsigned char)*(lpSrc + wide -1);
-                n2  = (unsigned char)*(lpSrc + wide );
-                n3 = (unsigned char)*(lpSrc + wide +1);
-                n4 = (unsigned char)*(lpSrc -1);
-                n5= (unsigned char)*(lpSrc +1);
-                n6 = (unsigned char)*(lpSrc - wide -1);
-                n7 = (unsigned char)*(lpSrc - wide );
-                n8 = (unsigned char)*(lpSrc - wide +1);
-                //如果相邻的八个点都是黑点
-                if(n1+n2+n3+n4+n5+n6+n7+n8==0)
-                {
-                    *lpDst = (unsigned char)255;
+
+    // 判断黑点周围8领域是否全为黑，如果全黑则置白
+    for (int y = 1; y < height - 1; y++) {
+        for (int x = 3; x < width - 3; x++) {
+            if (p_data[lineBytes * y + x * 3] == 0) {
+                int n1 = p_data[lineBytes * (y - 1) + (x - 3) * 3];
+                int n2 = p_data[lineBytes * (y - 1) + (x) * 3];
+                int n3 = p_data[lineBytes * (y - 1) + (x + 3) * 3];
+                int n4 = p_data[lineBytes * (y) + (x - 3) * 3];
+                int n5 = p_data[lineBytes * (y) + (x + 3) * 3];
+                int n6 = p_data[lineBytes * (y + 1) + (x - 3) * 3];
+                int n7 = p_data[lineBytes * (y + 1) + (x) * 3];
+                int n8 = p_data[lineBytes * (y + 1) + (x + 3) * 3];
+
+                if (n1 + n2 + n3 + n4 + n5 + n6 + n7 + n8 == 0) {
+                    p_temp[lineBytes * y + x * 3] = 255; // 掏空内部点
+                    p_temp[lineBytes * y + x * 3 + 1] = 255;
+                    p_temp[lineBytes * y + x * 3 + 2] = 255;
+                }
+                else {
+                    p_temp[lineBytes * y + x * 3] = 0;
+                    p_temp[lineBytes * y + x * 3 + 1] = 0;
+                    p_temp[lineBytes * y + x * 3 + 2] = 0;
                 }
             }
         }
     }
-    // 复制腐蚀后的图像
-    memcpy(p_data,temp, wide * height);
-    // 释放内存
-    delete temp;     
+
+    memcpy(p_data, p_temp, size);
+    delete p_temp;
+}
+
+///***************************************************************/           
+/*函数名称：Lunkuotiqu(int T)                                      
+/*函数类型：void  
+/*函数参数：int T 二值化阈值
+/*功能：对图像进行轮廓提取（对二值图，采用掏空内部点法）。            
+/***************************************************************/ 
+void BingXingBianJieDib::Lunkuotiqu(int T)
+{
+    int width = this->GetWidth(); // 原图宽度
+    int height = this->GetHeight(); // 原图高度
+    int lineBytes = this->GetDibWidthBytes(); // 原图 4 字节对齐后的宽度
+    int size = lineBytes * height;
+    LPBYTE p_data = this->GetData (); //原图数据区指针
+    LPBYTE p_temp = new BYTE[size];
+    memset(p_temp, 255, size);
+
+    width = GetRGB() ? width : lineBytes;
+
+    // 二值化
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            int index = lineBytes * y + x;
+            if (p_data[index] > T)
+                p_data[index] = 255;
+            else
+                p_data[index] = 0;
+        }
+    }
+
+    // 判断黑点周围8领域是否全为黑，如果全黑则置白
+    for (int y = 1; y < height - 1; y++) {
+        for (int x = 1; x < width - 1; x++) {
+            if (p_data[lineBytes * y + x] == 0) {
+                int n1 = p_data[lineBytes * (y - 1) + (x - 1)];
+                int n2 = p_data[lineBytes * (y - 1) + (x)];
+                int n3 = p_data[lineBytes * (y - 1) + (x + 1)];
+                int n4 = p_data[lineBytes * (y) + (x - 1)];
+                int n5 = p_data[lineBytes * (y) + (x + 1)];
+                int n6 = p_data[lineBytes * (y + 1) + (x - 1)];
+                int n7 = p_data[lineBytes * (y + 1) + (x)];
+                int n8 = p_data[lineBytes * (y + 1) + (x + 1)];
+                
+                if (n1 + n2 + n3 + n4 + n5 + n6 + n7 + n8 == 0)
+                    p_temp[lineBytes * y + x] = 255; // 掏空内部点
+                else
+                    p_temp[lineBytes * y + x] = 0;
+            }
+        }
+    }
+
+    memcpy(p_data, p_temp, size);
+    delete p_temp;
 }
 
 ///***************************************************************/           

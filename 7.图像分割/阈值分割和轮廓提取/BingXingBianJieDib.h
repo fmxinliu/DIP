@@ -31,8 +31,8 @@ public:
     void Qiyuzengzhang(CPoint point);
     void Zhongzitianchong(CPoint SeedPoint);
     void Lunkuogenzong();
-    void Lunkuotiqu();
-    void Lunkuotiqu2();
+    void Lunkuotiqu(int T);
+    void Lunkuotiqu2(int T);
     void BanYuZhi(int Yuzhi);  // 阈值或半阈值分割法，需要人工根据灰度直方图选取阈值（一般为波谷），分割前景和背景
     void Yuzhifenge(int Yuzhi);
     void Diedaifazhi(); // 迭代阈值法，指定初始阈值，由程序自动迭代计算阈值
