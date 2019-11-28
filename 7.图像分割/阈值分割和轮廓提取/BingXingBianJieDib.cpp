@@ -12,6 +12,33 @@ BingXingBianJieDib::~BingXingBianJieDib()
 {
 }
 
+// 彩色图像灰度化
+void BingXingBianJieDib::RgbToGray()
+{
+    if (GetRGB())
+        return;
+
+    int width = GetWidth();
+    int height = GetHeight();
+    int lineBytes = GetDibWidthBytes();
+
+    LPBYTE p_data = GetData();
+
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            BYTE b = p_data[lineBytes * y + x * 3];
+            BYTE g = p_data[lineBytes * y + x * 3 + 1];
+            BYTE r = p_data[lineBytes * y + x * 3 + 2];
+
+            BYTE gray = (BYTE)(0.11 * r + 0.59 * g + 0.3 * b); // RGB -> gray
+
+            p_data[lineBytes * y + x * 3] = gray;
+            p_data[lineBytes * y + x * 3 + 1] = gray;
+            p_data[lineBytes * y + x * 3 + 2] = gray;
+        }
+    }
+}
+
 ///***************************************************************/           
 /*函数名称：Lunkuotiqu()                                      
 /*函数类型：void                                     
@@ -777,6 +804,8 @@ void BingXingBianJieDib::Zhifangtu(float *tongji)
 /***************************************************************/
 void BingXingBianJieDib::BanYuZhi(int Yuzhi)
 {
+    this->RgbToGray();
+
     int width = this->GetWidth(); // 原图宽度
     int height = this->GetHeight(); // 原图高度
     int lineBytes = this->GetDibWidthBytes(); // 原图 4 字节对齐后的宽度
@@ -798,6 +827,8 @@ void BingXingBianJieDib::BanYuZhi(int Yuzhi)
 /***************************************************************/
 void BingXingBianJieDib::Yuzhifenge(int Yuzhi)
 {
+    this->RgbToGray();
+
     int width = this->GetWidth(); // 原图宽度
     int height = this->GetHeight(); // 原图高度
     int lineBytes = this->GetDibWidthBytes(); // 原图 4 字节对齐后的宽度
@@ -857,6 +888,8 @@ void BingXingBianJieDib::Diedaifazhi()
 
         Temp0 = Temp1 = Temp2 = Temp3 = 0;
     }
+
+    this->RgbToGray();
 
     // 对各像素进行二值化
     for (int k = 0; k < lineBytes * height; k++)

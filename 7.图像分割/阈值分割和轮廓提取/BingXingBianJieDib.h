@@ -38,7 +38,6 @@ public:
     void Diedaifazhi(); // 迭代阈值法，指定初始阈值，由程序自动迭代计算阈值
     void Fenbutongji(int *tongji);
     void Zhifangtu(float *tongji);
-
-protected:
+    void RgbToGray();
 };
 #endif
