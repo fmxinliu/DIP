@@ -150,125 +150,106 @@ void BingXingBianJieDib::Lunkuotiqu(int T)
 
 ///***************************************************************/           
 /*函数名称：Lunkuogenzong()                                      
-/*函数类型：void                                     
+/*函数类型：void      
+/*函数参数：int T 二值化阈值
 /*功能：对图像进行边界跟踪。            
 /***************************************************************/ 
-void BingXingBianJieDib::Lunkuogenzong()
+void BingXingBianJieDib::Lunkuogenzong(int T)
 {
-       // 指向源图像的指针
-    LPBYTE    lpSrc;
-    LPBYTE   p_data ;
-    // 指向缓存图像的指针
-    LPBYTE    lpDst;
-    // 指向缓存DIB图像的指针
-    LPBYTE    temp;
-    long wide;
-    long height;
-    //循环变量
-    long i;
-    long j;
-    //像素值
-    long pixel;
-    //是否找到起始点及回到起始点
-    bool bFindStartPoint;
-    //是否扫描到一个边界点
-    bool bFindPoint;
-    //起始边界点与当前边界点
-    Point StartPoint,CurrentPoint;
-    //八个方向和起始扫描方向
-    int Direction[8][2]={{-1,1},{0,1},{1,1},{1,0},{1,-1},{0,-1},{-1,-1},{-1,0}};
-    int BeginDirect;
-    p_data=GetData();
-    if(m_pBitmapInfoHeader->biBitCount<9)    //灰度图像
-    {
-        wide=GetWidth();
-        height=GetHeight();
-        for (j=0;j<height;j++)
-        {
-            for(i=0;i<wide;i++)
-            {
-                lpSrc = (LPBYTE)p_data + wide * j + i;
-                if(*lpSrc>127)
-                    *lpSrc=255;
-                else
-                    *lpSrc=0;
-            }
-        }    
-        // 暂时分配内存，以保存新图像
-        temp = new BYTE[wide*height];
-        // 初始化新分配的内存，设定初始值为255
-        lpDst = temp;
-        memset(lpDst, (BYTE)255, wide * height);
-        //先找到最左上方的边界点
-        bFindStartPoint = false;
-        for (j = 0;j < height && !bFindStartPoint;j++)
-        {
-            for(i = 0;i < wide && !bFindStartPoint;i++)
-            {
-                // 指向源图像倒数第j行，第i个象素的指针            
-                lpSrc =  (LPBYTE)(p_data + wide * j + i);
-                //取得当前指针处的像素值，注意要转换为unsigned char型
-                pixel =  *lpSrc;
-                if(pixel ==0)
-                {
-                    bFindStartPoint = true;
-                    StartPoint.Height = j;
-                    StartPoint.Width = i;
-                    // 指向目标图像倒数第j行，第i个象素的指针            
-                    lpDst = (LPBYTE)(temp + wide * j + i);    
-                    *lpDst = 0;
-                }        
+    if (GetRGB() == NULL)
+        return;
+
+    int width = this->GetWidth(); // 原图宽度
+    int height = this->GetHeight(); // 原图高度
+    int lineBytes = this->GetDibWidthBytes(); // 原图 4 字节对齐后的宽度
+    int size = lineBytes * height;
+    LPBYTE p_data = this->GetData (); //原图数据区指针
+    LPBYTE p_temp = new BYTE[size];
+    memset(p_temp, 255, size);
+
+    ////width = GetRGB() ? width : lineBytes;
+
+    // 二值化
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < lineBytes; x++) {
+            int index = lineBytes * y + x;
+            if (p_data[index] > T)
+                p_data[index] = 255;
+            else
+                p_data[index] = 0;
+        }
+    }
+
+    // 八个方向和起始扫描方向
+    const int direction[8][2]={
+        {-1, 1},  // 左下
+        {0, 1},   // 下
+        {1, 1},   // 右下
+        {1, 0},   // 右
+        {1, -1},  // 右上
+        {0, -1},  // 上
+        {-1, -1}, // 左上 
+        {-1, 0}   // 左
+    };
+
+    Point startPoint; // 起始边界点
+
+    // 1.先找到最左上方的边界点
+    bool bFindStartPoint = false;
+    for (int y = 0; y < height && !bFindStartPoint; y++) {
+        for (int x = 0; x < width && !bFindStartPoint; x++) {
+            if (p_data[lineBytes * y + x] == 0) {
+                p_temp[lineBytes * y + x] = 0;
+                bFindStartPoint = true;
+                startPoint.Width = x;
+                startPoint.Height = y;
             }
         }
-        //由于起始点是在左下方，故起始扫描沿左上方向
-        BeginDirect = 0;
-        //跟踪边界
-        bFindStartPoint = false;
-        //从初始点开始扫描
-        CurrentPoint.Height = StartPoint.Height;
-        CurrentPoint.Width = StartPoint.Width;
-        while(!bFindStartPoint)
-        {
-            bFindPoint = false;
-            while(!bFindPoint)
-            {
-                //沿扫描方向查看一个像素
-                lpSrc = (LPBYTE)(p_data + wide * ( CurrentPoint.Height + Direction[BeginDirect][1])
-                    + (CurrentPoint.Width + Direction[BeginDirect][0]));
-                pixel =  *lpSrc;
-                if(pixel== 0)
-                {
-                    bFindPoint = true;
-                    CurrentPoint.Height = CurrentPoint.Height + Direction[BeginDirect][1];
-                    CurrentPoint.Width = CurrentPoint.Width + Direction[BeginDirect][0];
-                    if(CurrentPoint.Height == StartPoint.Height && CurrentPoint.Width == StartPoint.Width)
-                    {
-                        bFindStartPoint = true;
-                    }
-                    lpDst =  (LPBYTE)(temp + wide * CurrentPoint.Height + CurrentPoint.Width);
-                    *lpDst = 0;
-                    //扫描的方向逆时针旋转两格
-                    BeginDirect--;
-                    if(BeginDirect == -1)
-                        BeginDirect = 7;
-                    BeginDirect--;
-                    if(BeginDirect == -1)
-                        BeginDirect = 7;
-                }
-                else
-                {
-                    //扫描方向顺时针旋转一格
-                    BeginDirect++;
-                    if(BeginDirect == 8)
-                        BeginDirect = 0;
-                }
-            }
+    }
+
+    // 2.由于起始点是在左下方，故起始扫描沿左上方向
+    int beginDirect = 0;
+
+    // 从起始点开始扫描
+    Point pt;
+    Point currentPoint = startPoint;
+    while (true) {
+        // 沿扫描方向查看一个像素
+        pt.Width = currentPoint.Width  + direction[beginDirect][0];
+        pt.Height = currentPoint.Height + direction[beginDirect][1];
+        if (pt.Width < 0 || pt.Width >= width || pt.Height < 0 || pt.Height >= height) {
+            // 扫描方向顺时针旋转一格
+            beginDirect++;
+            if(beginDirect == 8)
+                beginDirect = 0;
+            continue;
         }
-        // 复制图像
-        memcpy(p_data, temp, wide * height);
-        // 释放内存
-        delete temp; 
-    }    
+ 
+        int pixel = p_data[lineBytes * pt.Height + pt.Width]; 
+        if (pixel == 0) {
+            currentPoint = pt;
+            p_temp[lineBytes * pt.Height + pt.Width] = 0; // 边界点
+            if(currentPoint.Height == startPoint.Height && currentPoint.Width == startPoint.Width)
+                break;
+
+            // 扫描的方向逆时针旋转两格
+            beginDirect--;
+            if(beginDirect == -1)
+                beginDirect = 7;
+            beginDirect--;
+            if(beginDirect == -1)
+                beginDirect = 7;
+        }
+        else {
+            // 扫描方向顺时针旋转一格
+            beginDirect++;
+            if(beginDirect == 8)
+                beginDirect = 0;
+        }
+    }
+
+    memcpy(p_data, p_temp, size);
+    delete p_temp; 
 }
 
 ///***************************************************************/           

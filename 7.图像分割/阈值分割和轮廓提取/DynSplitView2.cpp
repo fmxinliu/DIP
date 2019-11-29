@@ -193,7 +193,7 @@ void CDynSplitView2::OnLunkuogenzong()
     if(CDibNew1->m_pBitmapInfoHeader->biBitCount<9)
     {
         
-        CDibNew1->Lunkuogenzong();             //调用轮廓跟踪处理函数
+        CDibNew1->Lunkuogenzong(127);             //调用轮廓跟踪处理函数
         Invalidate();
     }
     else
