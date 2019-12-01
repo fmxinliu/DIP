@@ -231,7 +231,7 @@ void CDynSplitView2::OnLButtonDown(UINT nFlags, CPoint point)
         SeedPoint.x=point.x;
         SeedPoint.y=point.y;
         clearmem();
-        CDibNew1->Qiyuzengzhang(point);             //调用区域增长处理函数
+        CDibNew1->Quyuzengzhang(point);             //调用区域增长处理函数
         Invalidate();
         state=0;
     }
@@ -273,7 +273,7 @@ void CDynSplitView2::OnRButtonDown(UINT nFlags, CPoint point)
         point.x=point.x;
         point.y=point.y;
         clearmem();
-        CDibNew1->Qiyuzengzhang(point);             //调用种子填充处理函数
+        CDibNew1->Quyuzengzhang(point);             //调用种子填充处理函数
         Invalidate();
         state=0;
     }

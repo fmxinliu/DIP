@@ -448,76 +448,59 @@ void BingXingBianJieDib::Zhongzitianchong(CPoint SeedPoint)
 }
 
 ///***************************************************************/           
-/*函数名称：Qiyuzengzhang(CPoint point)                                      
+/*函数名称：Quyuzengzhang(CPoint point)                                      
 /*函数类型：void
 /*参数说明：point  ---获得生长点                                     
 /*功能：对图像进行区域生长。            
 /***************************************************************/
-void BingXingBianJieDib::Qiyuzengzhang(CPoint point)
+void BingXingBianJieDib::Quyuzengzhang(CPoint point)
 {
-    // 循环变量
-    int i;
-    int j;
-    // 指向DIB象素指针
-    LPBYTE p_data;
-    // 找到DIB图像象素起始位置    
-    p_data=GetData();
-    // DIB的宽度
-    LONG wide = GetWidth();    
-    // DIB的高度
-    LONG height =GetHeight();
-    if(m_pBitmapInfoHeader->biBitCount<9)    //灰度图像
-    {
-        // 计算种子点一的灰度值
-        unsigned char  zhongzi=*(p_data+point.y*wide+point.x);    
-        // 对各像素进行灰度转换
-        for (j = 0; j < height; j ++)
-        {
-            for (i = 0; i < wide; i ++)
-            {
-                //获取各颜色分量
-                unsigned char temp = *((unsigned char *)p_data + wide * j +i);
-                if (abs(temp - zhongzi) < 10)    //当前点同种子一灰度值比较接近
-                {                                
-                    //将种子一的颜色赋给当前像素             
-                    *((unsigned char *)p_data + wide * j + i ) = temp;
-                }
-                else 
-                    *((unsigned char *)p_data + wide * j + i ) =255;
+    int width = GetWidth();
+    int height = GetHeight();
+    int lineBytes = GetDibWidthBytes();
+
+    LPBYTE p_data = GetData();
+
+    if (GetRGB()) {
+        // 计算种子点的灰度值
+        BYTE zhongzhi = p_data[lineBytes * (height - point.y - 1) + point.x]; // 注意：图像倒置
+
+        // 遍历所有像素
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                BYTE temp = p_data[lineBytes * y + x];
+                if (abs(temp - zhongzhi) < 10)
+                    p_data[lineBytes * y + x] = zhongzhi; // 当前点同种子灰度值比较接近,用种子点灰度代替
+                else
+                    p_data[lineBytes * y + x] = 255;
             }
         }
     }
-    else    //24位彩色
-    {
-        // 计算种子点一的灰度值
-        int  zhongzi=*(p_data+(height-point.y)*wide*3+point.x*3);
-        int   zhongzi2=*(p_data+(height-point.y)*wide*3+point.x*3+1);
-        int   zhongzi3=*(p_data+(height-point.y)*wide*3+point.x*3+2);      
-        // 对各像素进行灰度转换
-        for (j = 0; j < height; j ++)
-        {
-            for (i = 0; i < wide; i ++)
-            {
-                //获取各颜色分量
-                int  temp = *((unsigned char *)p_data + 3*wide * j +i*3);
-                int  temp2 = *((unsigned char *)p_data + 3*wide * j +i*3+1);
-                int  temp3 = *((unsigned char *)p_data + 3*wide * j +i*3+2);
-                if (abs(temp - zhongzi) < 10&&abs(temp2 - zhongzi2) < 10&&abs(temp3 - zhongzi3) < 10)    //当前点同种子一灰度值比较接近
-                {                                
-                    //将种子一的颜色赋给当前像素             
-                    *(p_data + 3*wide * j + i*3 ) = temp;
-                    *(p_data +3*wide* j + i*3+1 ) = temp2;
-                    *(p_data +3*wide * j + i*3+2 ) = temp3;
+    else {
+        // 计算种子点的灰度值
+        BYTE zhongzhi_b = p_data[lineBytes * (height - point.y - 1) + point.x * 3];
+        BYTE zhongzhi_g = p_data[lineBytes * (height - point.y - 1) + point.x * 3 + 1];
+        BYTE zhongzhi_r = p_data[lineBytes * (height - point.y - 1) + point.x * 3 + 2];
+
+        // 遍历所有像素
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                BYTE temp_b = p_data[lineBytes * y + x * 3];
+                BYTE temp_g = p_data[lineBytes * y + x * 3 + 1];
+                BYTE temp_r = p_data[lineBytes * y + x * 3 + 2];
+                if (abs(temp_b - zhongzhi_b) < 10 && abs(temp_g - zhongzhi_g) < 10 && abs(temp_r - zhongzhi_r) < 10) {
+                    p_data[lineBytes * y + x * 3] = zhongzhi_b; // 当前点同种子灰度值比较接近,用种子点灰度代替
+                    p_data[lineBytes * y + x * 3 + 1] = zhongzhi_g;
+                    p_data[lineBytes * y + x * 3 + 2] = zhongzhi_r;
                 }
-                else 
-                {
-                    *(p_data + 3*wide * j + i*3 ) =255;
-                    *(p_data + 3*wide * j + i*3+1 ) =255;
-                    *(p_data + 3*wide * j + i*3+2 ) = 255;
+                else {
+                    p_data[lineBytes * y + x * 3] = 255;
+                    p_data[lineBytes * y + x * 3 + 1] = 255;
+                    p_data[lineBytes * y + x * 3 + 2] = 255;
                 }
             }
         }
-    } 
+    }
 }
 
 ///***************************************************************/           

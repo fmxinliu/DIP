@@ -28,7 +28,7 @@ public:
 public:
     void Lunkuogenzong(CPoint SeedPoint);
     void Lunkuotiqu(CPoint SeedPoint);
-    void Qiyuzengzhang(CPoint point);
+    void Quyuzengzhang(CPoint point);
     void Zhongzitianchong(CPoint SeedPoint);
     void Lunkuogenzong(int T);
     void Lunkuotiqu(int T);
