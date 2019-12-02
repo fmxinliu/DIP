@@ -222,7 +222,7 @@ void CDynSplitView2::OnLButtonDown(UINT nFlags, CPoint point)
         SeedPoint.y=point.y;
         
         clearmem();
-        CDibNew1->Zhongzitianchong(SeedPoint);             //调用种子填充处理函数
+        CDibNew1->Zhongzitianchong(SeedPoint, 110);             //调用种子填充处理函数
         Invalidate();
         state=0;
     }

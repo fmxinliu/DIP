@@ -252,198 +252,239 @@ void BingXingBianJieDib::Lunkuogenzong(int T)
     delete p_temp; 
 }
 
+bool PointExist(Seed *pSeeds, int stackPoint, int iCurrentPixelx, int iCurrentPixely)
+{
+    for (int i = 0; i < stackPoint; i++)
+    {
+        if (pSeeds[i].Width == iCurrentPixelx && pSeeds[i].Width == iCurrentPixely) 
+            return true;
+    }
+    
+    return false;
+}
+
 ///***************************************************************/           
 /*函数名称：Zhongzitianchong(CPoint SeedPoint)                                      
 /*函数类型：void
-/*参数说明：SeedPoint  ---选区种子点                                     
+/*参数说明：SeedPoint  ---选区种子点  
+           int T 二值化阈值
 /*功能：对图像进行种子填充。            
 /***************************************************************/ 
-void BingXingBianJieDib::Zhongzitianchong(CPoint SeedPoint)
+void BingXingBianJieDib::Zhongzitianchong(CPoint SeedPoint, int T)
 {
-    // 指向源图像的指针
-    LPBYTE    lpSrc;
-    //图像的高和宽
-    int height,wide ;
-    //像素值
-    long pixel;
-    //种子堆栈及指针
-    Seed *Seeds;
-    int StackPoint;
-    LPBYTE  temp;
-    //当前像素位置
-    int iCurrentPixelx,iCurrentPixely;
-    temp =this->GetData();
-    lpSrc=temp;
-    if(m_pBitmapInfoHeader->biBitCount<9)    //灰度图像
-    {
-        height=this->GetHeight();
-        wide=this->GetWidth();         
-        for(int  j=0;j<height;j++)
-        {
-            for(int  i=0;i<wide;i++)
-            {
-                if(*lpSrc>110)
-                    *lpSrc=255;
+    int width = GetWidth();
+    int height = GetHeight();
+    int lineBytes = GetDibWidthBytes();
+    int size = lineBytes * height;
+    LPBYTE p_data = GetData();
+
+    // 种子堆栈及指针
+    Seed *pSeeds;
+    int stackPoint;
+    
+    // 当前像素位置
+    int iCurrentPixelx, iCurrentPixely;
+
+    if (GetRGB()) {
+        // 二值化
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < lineBytes; x++) {
+                int index = lineBytes * y + x;
+                if (p_data[index] > T)
+                    p_data[index] = 255;
                 else
-                    *lpSrc=0; 
-                lpSrc++;
-            }
-        }         
-        //初始化种子
-        Seeds = new Seed[wide*height];
-        Seeds[1].Height = SeedPoint.y;
-        Seeds[1].Width = SeedPoint.x;
-        StackPoint = 1;
-        while( StackPoint != 0)
-        {
-            //取出种子
-            iCurrentPixelx = Seeds[StackPoint].Width;
-            iCurrentPixely = Seeds[StackPoint].Height;
-            StackPoint--;
-            lpSrc = (LPBYTE)temp + wide * iCurrentPixely + iCurrentPixelx;
-            //取得当前指针处的像素值，注意要转换为unsigned char型
-            pixel =  *lpSrc;     
-            //将当前点涂黑
-            *lpSrc =0;
-            //判断左面的点，如果为白，则压入堆栈
-            //注意防止越界
-            if(iCurrentPixelx > 0)
-            {
-                lpSrc = (LPBYTE)temp + wide * iCurrentPixely + iCurrentPixelx - 1;
-                //取得当前指针处的像素值，注意要转换为unsigned char型
-                pixel =  *lpSrc;
-                if (pixel == 255)
-                {
-                    StackPoint++;
-                    Seeds[StackPoint].Height = iCurrentPixely;
-                    Seeds[StackPoint].Width = iCurrentPixelx - 1;
-                }
-            }
-            //判断上面的点，如果为白，则压入堆栈
-            //注意防止越界
-            if(iCurrentPixely < height - 1)
-            {
-                lpSrc = (LPBYTE)temp + wide * (iCurrentPixely + 1) + iCurrentPixelx;
-                //取得当前指针处的像素值，注意要转换为unsigned char型
-                pixel =  *lpSrc;
-                if (pixel == 255)
-                {
-                    StackPoint++;
-                    Seeds[StackPoint].Height = iCurrentPixely + 1;
-                    Seeds[StackPoint].Width = iCurrentPixelx;
-                }
-            }
-            //判断右面的点，如果为白，则压入堆栈
-            //注意防止越界
-            if(iCurrentPixelx < wide - 1)
-            {
-                lpSrc = (LPBYTE)temp + wide * iCurrentPixely + iCurrentPixelx + 1;
-                //取得当前指针处的像素值，注意要转换为unsigned char型
-                pixel =  *lpSrc;
-                if (pixel == 255)
-                {
-                    StackPoint++;
-                    Seeds[StackPoint].Height = iCurrentPixely;
-                    Seeds[StackPoint].Width = iCurrentPixelx + 1;
-                }
-            }
-            //判断下面的点，如果为白，则压入堆栈
-            //注意防止越界
-            if(iCurrentPixely > 0)
-            {
-                lpSrc = (LPBYTE)temp + wide * (iCurrentPixely - 1) + iCurrentPixelx;
-                //取得当前指针处的像素值，注意要转换为unsigned char型
-                pixel =  *lpSrc;
-                if (pixel == 255)
-                {
-                    StackPoint++;
-                    Seeds[StackPoint].Height = iCurrentPixely - 1;
-                    Seeds[StackPoint].Width = iCurrentPixelx;
-                }         
+                    p_data[index] = 0;
             }
         }
+
+        //初始化种子
+        pSeeds = new Seed[size];
+        pSeeds[1].Width = SeedPoint.x;
+        pSeeds[1].Height = SeedPoint.y;
+        stackPoint = 1;
+
+        while (stackPoint != 0) {
+            //取出种子
+            iCurrentPixelx = pSeeds[stackPoint].Width;
+            iCurrentPixely = pSeeds[stackPoint].Height;
+            stackPoint--;
+
+            //将当前点涂黑
+            p_data[lineBytes * (height - iCurrentPixely - 1) + iCurrentPixelx] = 0;
+
+            // 判断左面的点，如果为白，则压入堆栈
+            if (iCurrentPixelx > 1) { //注意防止越界
+                int left_pixel = p_data[lineBytes * (height - iCurrentPixely - 1) + (iCurrentPixelx - 1)];
+                if (left_pixel == 255) {
+                    stackPoint++;
+                    pSeeds[stackPoint].Width = iCurrentPixelx - 1;
+                    pSeeds[stackPoint].Height = iCurrentPixely;  
+                }
+            }
+
+            // 判断上面的点，如果为白，则压入堆栈
+            if (iCurrentPixely > 1) { //注意防止越界
+                int up_pixel = p_data[lineBytes * (height - iCurrentPixely) + iCurrentPixelx];
+                if (up_pixel == 255) {
+                    stackPoint++;
+                    pSeeds[stackPoint].Width = iCurrentPixelx;
+                    pSeeds[stackPoint].Height = iCurrentPixely - 1;
+                }
+            }
+
+            // 判断右面的点，如果为白，则压入堆栈
+            if (iCurrentPixelx < width - 1) { //注意防止越界
+                int right_pixel = p_data[lineBytes * (height - iCurrentPixely - 1) + (iCurrentPixelx + 1)];
+                if (right_pixel == 255) {
+                    stackPoint++;
+                    pSeeds[stackPoint].Width = iCurrentPixelx + 1;
+                    pSeeds[stackPoint].Height = iCurrentPixely;
+                }
+            }
+
+            // 判断下面的点，如果为白，则压入堆栈
+            if (iCurrentPixely < height - 1) { //注意防止越界
+                int down_pixel = p_data[lineBytes * (height - iCurrentPixely - 2) + iCurrentPixelx];
+                if (down_pixel == 255) {
+                    stackPoint++;
+                    pSeeds[stackPoint].Width = iCurrentPixelx;
+                    pSeeds[stackPoint].Height = iCurrentPixely + 1;
+                }
+            }
+        }
+
         //释放堆栈
-        delete Seeds;
+        delete pSeeds;
     }
-    else    //24位彩色
-    {
-        height=this->GetHeight();
-        wide=this->GetDibWidthBytes();         
-        //初始化种子
-        Seeds = new Seed[wide*height];
-        Seeds[1].Height = SeedPoint.y;
-        Seeds[1].Width = SeedPoint.x*3;
-        StackPoint = 1;
-        while( StackPoint != 0)
-        {
-            //取出种子
-            iCurrentPixelx = Seeds[StackPoint].Width;
-            iCurrentPixely = Seeds[StackPoint].Height;
-            StackPoint--;
-            lpSrc = (LPBYTE)temp + wide * iCurrentPixely + iCurrentPixelx;
-            //取得当前指针处的像素值，注意要转换为unsigned char型
-            pixel =  *lpSrc;     
-            //将当前点涂黑
-            *lpSrc =0;
-            //判断左面的点，如果为白，则压入堆栈
-            //注意防止越界
-            if(iCurrentPixelx > 0)
-            {
-                lpSrc = (LPBYTE)temp + wide * iCurrentPixely + iCurrentPixelx - 1;
-                //取得当前指针处的像素值，注意要转换为unsigned char型
-                pixel =  *lpSrc;
-                if (pixel == 255)
-                {
-                    StackPoint++;
-                    Seeds[StackPoint].Height = iCurrentPixely;
-                    Seeds[StackPoint].Width = iCurrentPixelx - 1;
-                }
-            }
-            //判断上面的点，如果为白，则压入堆栈
-            //注意防止越界
-            if(iCurrentPixely < height - 1)
-            {
-                lpSrc = (LPBYTE)temp + wide * (iCurrentPixely + 1) + iCurrentPixelx;
-                //取得当前指针处的像素值，注意要转换为unsigned char型
-                pixel =  *lpSrc;
-                if (pixel == 255)
-                {
-                    StackPoint++;
-                    Seeds[StackPoint].Height = iCurrentPixely + 1;
-                    Seeds[StackPoint].Width = iCurrentPixelx;
-                }         
-            }
-            //判断右面的点，如果为白，则压入堆栈
-            //注意防止越界
-            if(iCurrentPixelx < wide - 1)
-            {
-                lpSrc = (LPBYTE)temp + wide * iCurrentPixely + iCurrentPixelx + 1;
-                //取得当前指针处的像素值，注意要转换为unsigned char型
-                pixel =  *lpSrc;
-                if (pixel == 255)
-                {
-                    StackPoint++;
-                    Seeds[StackPoint].Height = iCurrentPixely;
-                    Seeds[StackPoint].Width = iCurrentPixelx + 1;
-                }
-            }
-            //判断下面的点，如果为白，则压入堆栈
-            //注意防止越界
-            if(iCurrentPixely > 0)
-            {
-                lpSrc = (LPBYTE)temp + wide * (iCurrentPixely - 1) + iCurrentPixelx;
-                //取得当前指针处的像素值，注意要转换为unsigned char型
-                pixel =  *lpSrc;
-                if (pixel == 255)
-                {
-                    StackPoint++;
-                    Seeds[StackPoint].Height = iCurrentPixely - 1;
-                    Seeds[StackPoint].Width = iCurrentPixelx;
-                }         
+    else {
+        //this->RgbToGray();
+        // 二值化
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < lineBytes; x++) {
+                int index = lineBytes * y + x;
+                if (p_data[index] > T)
+                    p_data[index] = 255;
+                else
+                    p_data[index] = 0;
             }
         }
+
+        pSeeds = new Seed[size];
+        for (int k = 0; k < 3; k++) { // bgr 三通道
+            //初始化种子
+            stackPoint = k + 3;
+            pSeeds[stackPoint].Width = SeedPoint.x * 3 + k;
+            pSeeds[stackPoint].Height = SeedPoint.y;
+        
+            while (stackPoint != k) {
+                //取出种子
+                iCurrentPixelx = pSeeds[stackPoint].Width;
+                iCurrentPixely = pSeeds[stackPoint].Height;
+                stackPoint -= 3;
+
+                //将当前点涂黑
+                p_data[lineBytes * (height - iCurrentPixely - 1) + iCurrentPixelx] = 0;
+
+                // 判断左面的点，如果为白，则压入堆栈
+                if (iCurrentPixelx > 3) { //注意防止越界
+                    int left_pixel = p_data[lineBytes * (height - iCurrentPixely - 1) + (iCurrentPixelx - 3)];
+                    if (left_pixel == 255) {
+                        stackPoint += 3;
+                        pSeeds[stackPoint].Width = iCurrentPixelx - 3;
+                        pSeeds[stackPoint].Height = iCurrentPixely;  
+                    }
+                }
+
+                // 判断上面的点，如果为白，则压入堆栈
+                if (iCurrentPixely > 1) { //注意防止越界
+                    int up_pixel = p_data[lineBytes * (height - iCurrentPixely) + iCurrentPixelx];
+                    if (up_pixel == 255) {
+                        stackPoint += 3;
+                        pSeeds[stackPoint].Width = iCurrentPixelx;
+                        pSeeds[stackPoint].Height = iCurrentPixely - 1;
+                    }
+                }
+
+                // 判断右面的点，如果为白，则压入堆栈
+                if (iCurrentPixelx < width * 3 - 3) { //注意防止越界
+                    int right_pixel = p_data[lineBytes * (height - iCurrentPixely - 1) + (iCurrentPixelx + 3)];
+                    if (right_pixel == 255) {
+                        stackPoint += 3;
+                        pSeeds[stackPoint].Width = iCurrentPixelx + 3;
+                        pSeeds[stackPoint].Height = iCurrentPixely;
+                    }
+                }
+
+                // 判断下面的点，如果为白，则压入堆栈
+                if (iCurrentPixely < height - 1) { //注意防止越界
+                    int down_pixel = p_data[lineBytes * (height - iCurrentPixely - 2) + iCurrentPixelx];
+                    if (down_pixel == 255) {
+                        stackPoint += 3;
+                        pSeeds[stackPoint].Width = iCurrentPixelx;
+                        pSeeds[stackPoint].Height = iCurrentPixely + 1;
+                    }
+                }
+            }
+        }
+
+        ////初始化种子
+        //pSeeds = new Seed[size];
+        //pSeeds[1].Width = SeedPoint.x * 3;
+        //pSeeds[1].Height = SeedPoint.y;
+        //stackPoint = 1;
+
+        //while (stackPoint != 0) {
+        //    //取出种子
+        //    iCurrentPixelx = pSeeds[stackPoint].Width;
+        //    iCurrentPixely = pSeeds[stackPoint].Height;
+        //    stackPoint--;
+
+        //    //将当前点涂黑
+        //    p_data[lineBytes * (height - iCurrentPixely - 1) + iCurrentPixelx] = 0;
+
+        //    // 判断左面的点，如果为白，则压入堆栈
+        //    if (iCurrentPixelx > 1) { //注意防止越界
+        //        int left_pixel = p_data[lineBytes * (height - iCurrentPixely - 1) + (iCurrentPixelx - 1)];
+        //        if (left_pixel == 255) {
+        //            stackPoint++;
+        //            pSeeds[stackPoint].Width = iCurrentPixelx - 1;
+        //            pSeeds[stackPoint].Height = iCurrentPixely;  
+        //        }
+        //    }
+
+        //    // 判断上面的点，如果为白，则压入堆栈
+        //    if (iCurrentPixely > 1) { //注意防止越界
+        //        int up_pixel = p_data[lineBytes * (height - iCurrentPixely) + iCurrentPixelx];
+        //        if (up_pixel == 255) {
+        //            stackPoint++;
+        //            pSeeds[stackPoint].Width = iCurrentPixelx;
+        //            pSeeds[stackPoint].Height = iCurrentPixely - 1;
+        //        }
+        //    }
+
+        //    // 判断右面的点，如果为白，则压入堆栈
+        //    if (iCurrentPixelx < width * 3 - 1) { //注意防止越界
+        //        int right_pixel = p_data[lineBytes * (height - iCurrentPixely - 1) + (iCurrentPixelx + 1)];
+        //        if (right_pixel == 255) {
+        //            stackPoint++;
+        //            pSeeds[stackPoint].Width = iCurrentPixelx + 1;
+        //            pSeeds[stackPoint].Height = iCurrentPixely;
+        //        }
+        //    }
+
+        //    // 判断下面的点，如果为白，则压入堆栈
+        //    if (iCurrentPixely < height - 1) { //注意防止越界
+        //        int down_pixel = p_data[lineBytes * (height - iCurrentPixely - 2) + iCurrentPixelx];
+        //        if (down_pixel == 255) {
+        //            stackPoint++;
+        //            pSeeds[stackPoint].Width = iCurrentPixelx;
+        //            pSeeds[stackPoint].Height = iCurrentPixely + 1;
+        //        }
+        //    }
+        //}
+
         //释放堆栈
-        delete Seeds;
+        delete pSeeds;
     }
 }
 
