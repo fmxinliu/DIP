@@ -1,4 +1,4 @@
-//Microsoft Developer Studio generated resource script.
+// Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
 
@@ -13,21 +13,19 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Chinese (P.R.C.) resources
+// 中文(简体，中国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
-#ifdef _WIN32
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
 #pragma code_page(936)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
 //
 
-IDD_DIALOG2 DIALOG DISCARDABLE  0, 0, 220, 108
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_DIALOG2 DIALOG 0, 0, 220, 108
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Dialog"
 FONT 10, "System"
 BEGIN
@@ -39,7 +37,7 @@ BEGIN
 END
 
 IDD_SQUARE_DLG DIALOGEX 0, 0, 247, 197
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Dialog"
 FONT 10, "System", 0, 0, 0x1
 BEGIN
@@ -48,16 +46,14 @@ BEGIN
     EDITTEXT        IDC_EDIT1,134,23,39,12,ES_CENTER | ES_AUTOHSCROLL
     LTEXT           "共有几个连通区？",IDC_STATIC,63,26,64,10
     GROUPBOX        "各个连通区面积 ： (单位:像素)",IDC_STATIC,31,62,185,94
-    EDITTEXT        IDC_SQUARE_EDIT2,41,72,165,70,ES_RIGHT | ES_MULTILINE | 
-                    ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_WANTRETURN,
-                    WS_EX_CLIENTEDGE | WS_EX_LEFTSCROLLBAR
+    EDITTEXT        IDC_SQUARE_EDIT2,41,72,165,70,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_WANTRETURN,WS_EX_CLIENTEDGE | WS_EX_LEFTSCROLLBAR
     GROUPBOX        "面积连通区：",IDC_STATIC,31,8,185,148
     LTEXT           "总共面积(像素)：",IDC_STATIC,63,42,61,9
     EDITTEXT        IDC_SQUARE_ALL,124,40,65,15,ES_CENTER | ES_AUTOHSCROLL
 END
 
-IDD_DELSMALL_DLG DIALOG DISCARDABLE  0, 0, 191, 110
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_DELSMALL_DLG DIALOG 0, 0, 191, 110
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Dialog"
 FONT 10, "System"
 BEGIN
@@ -69,7 +65,7 @@ BEGIN
 END
 
 IDD_LINE_DLG DIALOGEX 0, 0, 250, 191
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Dialog"
 FONT 10, "System", 0, 0, 0x1
 BEGIN
@@ -78,9 +74,7 @@ BEGIN
     EDITTEXT        IDC_EDIT1,134,25,39,12,ES_CENTER | ES_AUTOHSCROLL
     LTEXT           "共有几个连通区？",IDC_STATIC,63,28,64,10
     GROUPBOX        "各个连通区周长 ： (单位:像素)",IDC_STATIC,31,64,185,94
-    EDITTEXT        IDC_LINE_EDIT2,51,76,158,70,ES_RIGHT | ES_MULTILINE | 
-                    ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_WANTRETURN,
-                    WS_EX_CLIENTEDGE | WS_EX_LEFTSCROLLBAR
+    EDITTEXT        IDC_LINE_EDIT2,51,76,158,70,ES_RIGHT | ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_WANTRETURN,WS_EX_CLIENTEDGE | WS_EX_LEFTSCROLLBAR
     GROUPBOX        "边界连通区：",IDC_STATIC,31,10,185,148
     LTEXT           "总共周长(像素)：",IDC_STATIC,63,44,61,9
     EDITTEXT        IDC_LINE_ALL,124,42,65,15,ES_CENTER | ES_AUTOHSCROLL
@@ -93,7 +87,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO DISCARDABLE 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_DIALOG2, DIALOG
     BEGIN
@@ -135,24 +129,24 @@ END
 // Menu
 //
 
-IDR_MAINFRAME MENU PRELOAD DISCARDABLE 
+IDR_MAINFRAME MENU
 BEGIN
     POPUP "文件"
     BEGIN
-        MENUITEM "打开8位或24位图象文件",       ID_FILEOPEN
-        MENUITEM "保存处理后的图象",            ID_FILESAVE
+        MENUITEM "打开8位或24位图象文件",                ID_FILEOPEN
+        MENUITEM "保存处理后的图象",                    ID_FILESAVE
         MENUITEM SEPARATOR
         MENUITEM "E&xit",                       ID_APP_EXIT
     END
     POPUP "计算"
     BEGIN
-        MENUITEM "显示原图",                    ID_YUANTU
+        MENUITEM "显示原图",                        ID_YUANTU
         MENUITEM SEPARATOR
-        MENUITEM "显示标号",                    ID_A
-        MENUITEM "面积计算",                    ID_AREAJISUAN
-        MENUITEM "周长计算",                    ID_FOLLOWLINE
+        MENUITEM "显示标号",                        ID_A
+        MENUITEM "面积计算",                        ID_AREAJISUAN
+        MENUITEM "周长计算",                        ID_FOLLOWLINE
         MENUITEM SEPARATOR
-        MENUITEM "小区域消除",                  ID_XIAOCHUSMALL
+        MENUITEM "小区域消除",                       ID_XIAOCHUSMALL
     END
 END
 
@@ -162,14 +156,14 @@ END
 // Bitmap
 //
 
-IDR_MAINFRAME           BITMAP  MOVEABLE PURE   "res\\Toolbar.bmp"
+IDR_MAINFRAME           BITMAP                  "res\\Toolbar.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Toolbar
 //
 
-IDR_MAINFRAME TOOLBAR DISCARDABLE  16, 15
+IDR_MAINFRAME TOOLBAR 16, 15
 BEGIN
     BUTTON      ID_FILEOPEN
     SEPARATOR
@@ -183,7 +177,7 @@ END
 // String Table
 //
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE
 BEGIN
     ID_FILEOPEN             " 打开8位或24位图象文件\n 打开8位或24位图象文件"
     ID_YUANTU               "显示原图\n显示原图"
@@ -192,36 +186,32 @@ BEGIN
     ID_AREAJISUAN           "面积计算"
 END
 
-#endif    // Chinese (P.R.C.) resources
+#endif    // 中文(简体，中国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// 英语(美国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
 //
 
-IDD_ABOUTBOX DIALOG DISCARDABLE  0, 0, 246, 55
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_ABOUTBOX DIALOG 0, 0, 246, 55
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "About DSplit"
 FONT 8, "MS Sans Serif"
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,9,8,20,20
-    LTEXT           "Dynamic splitter (demo)",IDC_STATIC,40,10,119,8,
-                    SS_NOPREFIX
+    LTEXT           "Dynamic splitter (demo)",IDC_STATIC,40,10,119,8,SS_NOPREFIX
     LTEXT           "SAGA Incorporated, 1998",IDC_STATIC,40,22,132,8
     DEFPUSHBUTTON   "OK",IDOK,207,7,32,14,WS_GROUP
-    LTEXT           "Developed by Andrew Slivker for www.codeguru.com",
-                    IDC_STATIC,40,33,173,8
+    LTEXT           "Developed by Andrew Slivker for www.codeguru.com",IDC_STATIC,40,33,173,8
 END
 
 
@@ -231,7 +221,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO DISCARDABLE 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_ABOUTBOX, DIALOG
     BEGIN
@@ -250,18 +240,18 @@ END
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE DISCARDABLE 
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE DISCARDABLE 
+2 TEXTINCLUDE 
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE DISCARDABLE 
+3 TEXTINCLUDE 
 BEGIN
     "#define _AFX_NO_OLE_RESOURCES\r\n"
     "#define _AFX_NO_TRACKER_RESOURCES\r\n"
@@ -288,15 +278,15 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDR_MAINFRAME           ICON    DISCARDABLE     "res\\DSplit.ico"
-IDR_DSPLITTYPE          ICON    DISCARDABLE     "res\\DSplitDoc.ico"
+IDR_MAINFRAME           ICON                    "res\\DSplit.ico"
+IDR_DSPLITTYPE          ICON                    "res\\DSplitDoc.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Accelerator
 //
 
-IDR_MAINFRAME ACCELERATORS PRELOAD MOVEABLE PURE 
+IDR_MAINFRAME ACCELERATORS
 BEGIN
     "N",            ID_FILE_NEW,            VIRTKEY, CONTROL
     "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL
@@ -315,7 +305,6 @@ BEGIN
 END
 
 
-#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
@@ -338,14 +327,13 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "CompanyName", "\0"
-            VALUE "FileDescription", "Dynamic splitter (demo)\0"
-            VALUE "FileVersion", "1, 0, 0, 1\0"
-            VALUE "InternalName", "DSplit\0"
-            VALUE "LegalCopyright", "SAGA Incorporated, Copyright (C) 1998\0"
-            VALUE "OriginalFilename", "DSplit.EXE\0"
-            VALUE "ProductName", "Dynamic splitter (demo)\0"
-            VALUE "ProductVersion", "1, 0, 0, 1\0"
+            VALUE "FileDescription", "Dynamic splitter (demo)"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "DSplit"
+            VALUE "LegalCopyright", "SAGA Incorporated, Copyright (C) 1998"
+            VALUE "OriginalFilename", "DSplit.EXE"
+            VALUE "ProductName", "Dynamic splitter (demo)"
+            VALUE "ProductVersion", "1, 0, 0, 1"
         END
     END
     BLOCK "VarFileInfo"
@@ -354,26 +342,24 @@ BEGIN
     END
 END
 
-#endif    // !_MAC
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // String Table
 //
 
-STRINGTABLE PRELOAD DISCARDABLE 
+STRINGTABLE
 BEGIN
     IDR_MAINFRAME           "DSplit\n\nDSplit\n\n\nDSplit.Document\nDSplit Document"
 END
 
-STRINGTABLE PRELOAD DISCARDABLE 
+STRINGTABLE
 BEGIN
     AFX_IDS_APP_TITLE       "DSplit"
     AFX_IDS_IDLEMESSAGE     "Ready"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE
 BEGIN
     ID_INDICATOR_EXT        "EXT"
     ID_INDICATOR_CAPS       "CAP"
@@ -383,7 +369,7 @@ BEGIN
     ID_INDICATOR_REC        "REC"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE
 BEGIN
     ID_FILE_NEW             "Create a new document\nNew"
     ID_FILE_OPEN            "Open an existing document\nOpen"
@@ -395,13 +381,13 @@ BEGIN
     ID_FILE_PRINT_PREVIEW   "Display full pages\nPrint Preview"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE
 BEGIN
     ID_APP_ABOUT            "Display program information, version number and copyright\nAbout"
     ID_APP_EXIT             "Quit the application; prompts to save documents\nExit"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE
 BEGIN
     ID_FILE_MRU_FILE1       "Open this document"
     ID_FILE_MRU_FILE2       "Open this document"
@@ -421,18 +407,18 @@ BEGIN
     ID_FILE_MRU_FILE16      "Open this document"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE
 BEGIN
     ID_NEXT_PANE            "Switch to the next window pane\nNext Pane"
     ID_PREV_PANE            "Switch back to the previous window pane\nPrevious Pane"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE
 BEGIN
     ID_WINDOW_SPLIT         "Split the active window into panes\nSplit"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE
 BEGIN
     ID_EDIT_CLEAR           "Erase the selection\nErase"
     ID_EDIT_CLEAR_ALL       "Erase everything\nErase All"
@@ -447,13 +433,13 @@ BEGIN
     ID_EDIT_REDO            "Redo the previously undone action\nRedo"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE
 BEGIN
     ID_VIEW_TOOLBAR         "Show or hide the toolbar\nToggle ToolBar"
     ID_VIEW_STATUS_BAR      "Show or hide the status bar\nToggle StatusBar"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE
 BEGIN
     AFX_IDS_SCSIZE          "Change the window size"
     AFX_IDS_SCMOVE          "Change the window position"
@@ -464,23 +450,23 @@ BEGIN
     AFX_IDS_SCCLOSE         "Close the active window and prompts to save the documents"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE
 BEGIN
     AFX_IDS_SCRESTORE       "Restore the window to normal size"
     AFX_IDS_SCTASKLIST      "Activate Task List"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE
 BEGIN
     AFX_IDS_PREVIEW_CLOSE   "Close print preview mode\nCancel Preview"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE
 BEGIN
     ID_DYNSPLIT             "Dynamic splitter\nDynamic splitter"
 END
 
-#endif    // English (U.S.) resources
+#endif    // 英语(美国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

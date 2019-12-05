@@ -176,11 +176,12 @@ void JisuanProcessDib::xiaochugulidianBAI()
 }
 
 /***************************************************************/
-/*函数名称：biaoji()                                           */
-/*函数类型：void                                               */
+/*函数名称：biaoji(int T)                                       */
+/*函数类型：int                                                */
+/*函数参数：int T 二值化阈值                                    */
 /*功能：对图像进行标记,划分成不同的连通区域。                  */
 /***************************************************************/
-void JisuanProcessDib::biaoji()
+void JisuanProcessDib::biaoji(int T)
 {
     int width = GetWidth();
     int height = GetHeight();
@@ -300,12 +301,119 @@ void JisuanProcessDib::biaoji()
                 } //end if
             }
         }
-
-        delete p_temp;
     }
     else {
+        this->RgbToGray();
+        //// 由于已转化为24位灰度，故只统计 B 通道 ////
+        this->erzhihua(T); ///图像二值化
 
+        // 从左到右标号
+        for (int y = 1; y < height - 1; y++) { // 每行
+            if (stop) // 判断连通区是否太多
+                break;
+            for (int x = 1; x < width - 1; x++) { // 每列
+                if (signCount > 250) {
+                    AfxMessageBox("连通区数目太多,请增大阈值");
+                    stop = true;
+                    break;
+                }
+
+                int x0 = x;
+                int y0 = height - y - 1;
+                int indexCurrent = lineBytes * y0 + x0 * 3;
+                if (p_data[indexCurrent] == 0) {// 若当前点为黑点
+                    // 像素坐标
+                    int xRightUp = x + 1;
+                    int yRightUp = height - (y - 1) - 1;
+                    int xUp = x;
+                    int yUp = height - (y - 1) - 1;
+                    int xLeftUp = x - 1;
+                    int yLeftUp = height - (y - 1) - 1;
+                    int xLeft = x - 1;
+                    int yLeft = height - y - 1;
+                    int indexRightUp = lineBytes * yRightUp + xRightUp * 3;
+                    int indexUp = lineBytes * yUp + xUp * 3;
+                    int indexLeftUp = lineBytes * yLeftUp + xLeftUp * 3;
+                    int indexLeft = lineBytes * yLeft + xLeft * 3;
+
+                    // 标记
+                    if (p_data[indexRightUp] == 0) { //右上
+                        signID = p_temp[indexRightUp];
+                        p_temp[indexCurrent] = signID;
+                        flag[signID]++;
+
+                        // 1.如果左前与右上标记不同，并且是连通的，修改标记为右上
+                        if (p_data[indexLeft] == 0 && p_temp[indexLeft] != signID) { //左前
+                            int oldSign = p_temp[indexLeft];
+                            for(int m = 1; m <= height - 1; m++) {
+                                for(int n = 1; n <= width - 1; n++) {
+                                    int pixelIndex = lineBytes * (height - m - 1) + n * 3;
+                                    if (p_temp[pixelIndex] == oldSign) {
+                                        flag[oldSign]--;
+                                        p_temp[pixelIndex] = signID;
+                                        flag[signID]++;
+                                    }
+                                }
+                            }
+                        }//end//左前
+
+                        // 2.如果左上与右上标记不同，并且是连通的，修改标记为右上
+                        if (p_data[indexLeftUp] == 0 && p_temp[indexLeftUp] != signID) { //左上
+                            int oldSign = p_temp[indexLeftUp];
+                            for(int m = 1; m <= height - 1; m++) {
+                                for(int n = 1; n <= width - 1; n++) {
+                                    int pixelIndex = lineBytes * (height - m - 1) + n * 3;
+                                    if (p_temp[pixelIndex] == oldSign) {
+                                        flag[oldSign]--;
+                                        p_temp[pixelIndex] = signID;
+                                        flag[signID]++;
+                                    }
+                                }
+                            }
+                        }//end//左上
+
+                        // 3.如果正上与右上标记不同，并且是连通的，修改标记为右上
+                        if (p_data[indexUp] == 0 && p_temp[indexUp] != signID) { //正上
+                            int oldSign = p_temp[indexUp];
+                            for(int m = 1; m <= height - 1; m++) {
+                                for(int n = 1; n <= width - 1; n++) {
+                                    int pixelIndex = lineBytes * (height - m - 1) + n * 3;
+                                    if (p_temp[pixelIndex] == oldSign) {
+                                        flag[oldSign]--;
+                                        p_temp[pixelIndex] = signID;
+                                        flag[signID]++;
+                                    }
+                                }
+                            }
+                        }//end//正上
+                    }//end//右上
+                    else if (p_data[indexUp] == 0) { //正上
+                        signID = p_temp[indexUp];
+                        p_temp[indexCurrent] = signID;
+                        flag[signID]++;
+                    }
+                    else if (p_data[indexLeftUp] == 0) { //左上
+                        signID = p_temp[indexLeftUp];
+                        p_temp[indexCurrent] = signID;
+                        flag[signID]++;
+                    }
+                    else if (p_data[indexLeft] == 0) { //左前
+                        signID = p_temp[indexLeft];
+                        p_temp[indexCurrent] = signID;
+                        flag[signID]++;
+                    }
+                    else { // 没有
+                        signCount++;
+                        signID = signCount;
+                        p_temp[indexCurrent] = signID;
+                        flag[signID]++;
+                    }
+                } //end if
+            } //end 每列
+        } //end 每行
     }
+
+    delete p_temp;
 }
 //
 //{
@@ -490,20 +598,21 @@ void JisuanProcessDib::biaoji()
 //}
 
 /***************************************************************/
-/*函数名称：LianTong()                                         */
+/*函数名称：LianTong(int T)                                         */
 /*函数类型：void                                               */
-/*功能：对连通区调整,输出每个连通区的面积。                    */
+/*函数参数：int T 二值化阈值                                    */
+/*功能：对连通区调整,输出每个连通区的面积。                       */
 /***************************************************************/
-void JisuanProcessDib::LianTong()
+void JisuanProcessDib::LianTong(int T)
 {
-    biaoji();  //调用标记函数
+    biaoji(T);  //调用标记函数
     if(stop!=1)//判断连通区是否太多
     {
         int fg[255]={0};//定义一个数组
         memset(fg,0,255);//初始化赋值都为0
         int y_sign=0;
         int m_Area=0;//定义一个面积
-        for(int i=1;i<=x_sign;i++)
+        for(int i=0;i<255;i++)
         {
             if(flag[i]!=0)
             {
@@ -555,7 +664,7 @@ void JisuanProcessDib::LianTong()
 /***************************************************************/
 void JisuanProcessDib::ClearSMALL(int m_value)
 {
-    biaoji();  //调用标记函数
+    biaoji(m_value);  //调用标记函数
     if(m_pBitmapInfoHeader->biBitCount<9)    //灰度图像
     {
         if(stop!=1)//判断连通区是否太多
@@ -605,7 +714,7 @@ void JisuanProcessDib::ClearSMALL(int m_value)
 /***************************************************************/
 void JisuanProcessDib::Borderline()
 {
-    biaoji();  //调用标记函数
+    biaoji(100);  //调用标记函数
     LPBYTE    lpSrc;  // 指向源图像的指针
     LPBYTE    lpDst;    // 指向缓存图像的指针
     LPBYTE    temp;  // 指向缓存DIB图像的指针
@@ -735,7 +844,7 @@ void JisuanProcessDib::Borderline()
             //在对话框里输出每个连通区的周长（边界像素个数）
             for(int i=0;i<y_line;i++)
             {
-                ss[i].Format("连通区：%3d  该区周长:%10.0d",i+1,fn[i]);
+                ss[i].Format("连通区：%3d, 该区周长:%10.0d",i+1,fn[i]);
                 dlg.m_line+=ss[i];
             }
             dlg.DoModal();
@@ -911,7 +1020,7 @@ void JisuanProcessDib::Borderline()
 }
 
 //将24位彩色图像转换为24位灰度图
-void JisuanProcessDib::MakeGray()
+void JisuanProcessDib::RgbToGray()
 {
     BYTE *p_data;     //原图数据区指针
     int wide,height,DibWidth;    //原图长、宽、字节宽

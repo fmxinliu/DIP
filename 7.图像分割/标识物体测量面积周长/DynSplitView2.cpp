@@ -184,12 +184,12 @@ void CDynSplitView2::OnAreajisuan()
          memset(temp, (BYTE)255, wide * height);
 
          CDibNew1->Baoliu(temp);
-         CDibNew1->MakeGray();
+         CDibNew1->RgbToGray();
     }
     CDibNew1->erzhihua(yuzhi_gray);///图像二值化
 
     
-    CDibNew1->LianTong();//标记、计算像素区
+    CDibNew1->LianTong(yuzhi_gray);//标记、计算像素区
     
     if(CDibNew1->m_pBitmapInfoHeader->biBitCount==24)
     {
@@ -279,7 +279,7 @@ void CDynSplitView2::OnXiaochusmall()
          temp = new BYTE[wide*height];
          memset(temp, (BYTE)255, wide * height);
          CDibNew1->Baoliu(temp);
-         CDibNew1->MakeGray();
+         CDibNew1->RgbToGray();
     }
     CDibNew1->erzhihua(yuzhi_gray); //图像二值化
 
@@ -328,7 +328,7 @@ void CDynSplitView2::OnFollowline()
          memset(temp, (BYTE)255, wide * height);
 
          CDibNew1->Baoliu(temp);
-         CDibNew1->MakeGray();
+         CDibNew1->RgbToGray();
     }
 
     CDibNew1->erzhihua(yuzhi_gray);//图像二值化
@@ -398,14 +398,11 @@ void CDynSplitView2::OnMarkPart()
     //     temp = new BYTE[wide*height];
     //     memset(temp, (BYTE)255, wide * height);
     //     CDibNew1->Baoliu(temp);
-    //     CDibNew1->MakeGray();
+    //     CDibNew1->RgbToGray();
     //}
 
-    CDibNew1->erzhihua(yuzhi_gray);///图像二值化
+    CDibNew1->LianTong(Dlg.m_gray);//标记、计算像素区
     Invalidate();
-    
-    CDibNew1->LianTong();//标记、计算像素区
-
     //if(CDibNew1->m_pBitmapInfoHeader->biBitCount==24)
     //{
     //    LPBYTE  lpSrc,lpDst,temp2;
