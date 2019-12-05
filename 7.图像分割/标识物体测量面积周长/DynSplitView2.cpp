@@ -7,6 +7,7 @@
 #include "JisuanProcessDib.h"
 #include "YuZhi.h"
 #include "DELSMALL.h"
+#include "SquareDlg.h"
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -20,7 +21,9 @@ IMPLEMENT_DYNCREATE(CDynSplitView2, CView)
 
 CDynSplitView2::CDynSplitView2()
 {
-    state2=0;
+    count = 0;
+    state2 = 0;
+    state3 = 0;
 }
 
 void CDynSplitView2::clearmem()
@@ -33,7 +36,6 @@ void CDynSplitView2::clearmem()
     CDib1=&pDoc->CDib;
     long int  size=CDib1->GetHeight()*CDib1->GetDibWidthBytes();
     memcpy(CDibNew1->m_pData,CDib1->m_pData,size);
-
 }
 
 CPalette * CDynSplitView2::CreateBitmapPalette(JisuanProcessDib * pBitmap)
@@ -92,7 +94,7 @@ void CDynSplitView2::OnDraw(CDC* pDC)
 {    
     CDSplitDoc* pDoc = GetDocument();
     ASSERT_VALID(pDoc);
-    if(!pDoc ->statedoc&&state2==1)
+    if(!pDoc->statedoc&&state2==1)
     {
         int m_scale=1;
         BYTE* pBitmapData = CDibNew1->GetData();
@@ -121,6 +123,20 @@ void CDynSplitView2::OnDraw(CDC* pDC)
                 0, 0, bitmapWidth, bitmapHeight,
                 pBitmapData, pBitmapInfo,
                 DIB_RGB_COLORS, SRCCOPY);
+        }
+
+        // 绘制标号
+        if (state3 == 1 && count != 0)
+        {
+            CClientDC dc(this);   
+            dc.SetTextColor(100);
+            CString ss_Area[255];
+            for(int i = 1; i <= count; i++) {
+                if(CDibNew1->pppp[i].pp_area != 0) {
+                    ss_Area[i].Format("%d", CDibNew1->pppp[i].pp_number);
+                    dc.TextOut(CDibNew1->pppp[i].pp_x, CDibNew1->pppp[i].pp_y, ss_Area[i]);
+                }
+            }
         }
     }
 }
@@ -189,7 +205,7 @@ void CDynSplitView2::OnAreajisuan()
     CDibNew1->erzhihua(yuzhi_gray);///图像二值化
 
     
-    CDibNew1->LianTong(yuzhi_gray);//标记、计算像素区
+    CDibNew1->biaoji(yuzhi_gray);//标记、计算像素区
     
     if(CDibNew1->m_pBitmapInfoHeader->biBitCount==24)
     {
@@ -383,88 +399,49 @@ void CDynSplitView2::OnFollowline()
 void CDynSplitView2::OnMarkPart() 
 {
     clearmem();
-    LPBYTE temp;
-    int i,j;
-    int wide,height;
-    CYuZhi Dlg;
-    Dlg.m_gray = 100;
-    Dlg.DoModal();
-    yuzhi_gray=Dlg.m_gray;
+ 
+    CYuZhi dlg;
+    dlg.m_gray = 100;
+    dlg.DoModal();
 
-    //if(CDibNew1->m_pBitmapInfoHeader->biBitCount==24)
-    //{
-    //     wide=CDibNew1->GetDibWidthBytes();
-    //     height=CDibNew1->GetHeight();
-    //     temp = new BYTE[wide*height];
-    //     memset(temp, (BYTE)255, wide * height);
-    //     CDibNew1->Baoliu(temp);
-    //     CDibNew1->RgbToGray();
-    //}
+    count = 0;
+    count = CDibNew1->biaoji(dlg.m_gray); //标记、计算像素区
+    if (count) {
+        state3 = 1;
+        Invalidate();
+    }
+    else {
+        AfxMessageBox("连通区数目太多,请增大阈值"); 
+    }
+}
 
-    CDibNew1->LianTong(Dlg.m_gray);//标记、计算像素区
-    Invalidate();
-    //if(CDibNew1->m_pBitmapInfoHeader->biBitCount==24)
-    //{
-    //    LPBYTE  lpSrc,lpDst,temp2;
-    //    lpSrc=CDibNew1->GetData();
-    //    lpDst=temp;
-    //    temp2=lpSrc;
-    //    for(j=0;j<height;j++)
-    //        for(i=0;i<wide;i++)
-    //        {    
-    //            *lpSrc=*lpDst+*lpSrc;
-    //            if(*lpSrc>255)
-    //                *lpSrc=255;
-    //            lpSrc++;
-    //            lpDst++;
-    //            
-    //            }
-    //        lpSrc=temp2;
-    //}
-    //delete temp;
+// 统计区域面积
+void CDynSplitView2::ShowSquare(int count)
+{
+    if (count != 0) {
+        int signID = 0;  // 标记id
+        int areaSum = 0; // 总的像素面积
+        int fg[255] = {0}; // 各个区域的面积
+        memset(fg, 0, sizeof(fg)); //初始化赋值都为0
 
-    //CClientDC dc(this);   
-    //CDSplitDoc* pDoc = GetDocument();
-    //ASSERT_VALID(pDoc);
-    //if(!pDoc ->statedoc&&state2==1)
-    //{
-    //     int m_scale=1;
-    //    BYTE* pBitmapData = CDibNew1->GetData();
-    //    LPBITMAPINFO pBitmapInfo = CDibNew1->GetInfo();
-    //    int bitmapHeight = CDibNew1->GetHeight();
-    //    int bitmapWidth = CDibNew1->GetWidth();
-    //    int scaledWidth = (int)(bitmapWidth * m_scale);
-    //    int scaledHeight = (int)(bitmapHeight * m_scale);
-    //    if (CDibNew1->GetRGB()) // Has a color table
-    //    {
-    //        CPalette * hPalette=CreateBitmapPalette(CDibNew1);
-    //        CPalette * hOldPalette =
-    //            dc.SelectPalette(hPalette, true);
-    //        dc.RealizePalette();
-    //        ::StretchDIBits(dc.GetSafeHdc(),0, 0, scaledWidth, scaledHeight,
-    //            0, 0, bitmapWidth, bitmapHeight,
-    //            pBitmapData, pBitmapInfo,
-    //            DIB_RGB_COLORS, SRCCOPY);
-    //        dc.SelectPalette(hOldPalette, true);
-    //        ::DeleteObject(hPalette);
-    //    }
-    //    else
-    //    {
-    //        ::StretchDIBits(dc.GetSafeHdc(),0, 0, scaledWidth, scaledHeight,
-    //            0, 0, bitmapWidth, bitmapHeight,
-    //            pBitmapData, pBitmapInfo,
-    //            DIB_RGB_COLORS, SRCCOPY);
-    //    }
-    //}
-    //
-    //dc.SetTextColor(100);
-    //CString ss_Area[255];
-    //for(i=0;i<255;i++)
-    //{
-    //    if(CDibNew1->pppp[i].pp_area!=0)
-    //    ss_Area[i].Format("%d",CDibNew1->pppp[i].pp_number);
-    //    dc.TextOut(CDibNew1->pppp[i].pp_x,CDibNew1->pppp[i].pp_y,ss_Area[i]);
-    //}
-    //
+        // 区域统计
+        for (int i = 1; i <= count; i++) {
+            if (CDibNew1->flag[i] != 0) {
+                fg[signID] = CDibNew1->flag[i];
+                ++signID;
+                areaSum += CDibNew1->flag[i];
+            }
+        }
 
+        SquareDlg dlg; // 输出对话框
+        dlg.m_number = signID; // 输出连通区域个数
+        dlg.m_squareALL = areaSum; // 输出连通区域的总积
+        CString ss[20];
+        // 在对话框里输出每个连通区的面积（区域像素个数）
+        for(int i = 0; i < signID; i++) {
+            ss[i].Format("连通区：%3d，该区面积:%10.0d\r\n", i+1, fg[i]);
+            dlg.m_ShuChu += ss[i];
+        }
+        dlg.DoModal();
+    }
 }

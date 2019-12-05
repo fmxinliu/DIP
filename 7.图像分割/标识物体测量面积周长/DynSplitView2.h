@@ -30,11 +30,13 @@ public:
         CDib *CDib1;
         CPalette hPalette;
         int state2;
+        int state3;
         void clearmem();
+        void ShowSquare(int count);
 
         int yuzhi_gray;
 
-
+        int count;
 // Overrides
     // ClassWizard generated virtual function overrides
     //{{AFX_VIRTUAL(CDynSplitView2)

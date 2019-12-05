@@ -19,6 +19,7 @@ static char THIS_FILE[]=__FILE__;
 
 JisuanProcessDib::JisuanProcessDib()
 {
+    count = 0;
     x_sign=0;
     m_temp=0;
     x_temp=0;
@@ -29,7 +30,6 @@ JisuanProcessDib::JisuanProcessDib()
 
 JisuanProcessDib::~JisuanProcessDib()
 {
-    
 }
 
 /***************************************************************/
@@ -179,9 +179,9 @@ void JisuanProcessDib::xiaochugulidianBAI()
 /*函数名称：biaoji(int T)                                       */
 /*函数类型：int                                                */
 /*函数参数：int T 二值化阈值                                    */
-/*功能：对图像进行标记,划分成不同的连通区域。                  */
+/*功能：二值化，对图像标记,划分成不同的连通区域。                  */
 /***************************************************************/
-void JisuanProcessDib::biaoji(int T)
+int JisuanProcessDib::biaoji(int T)
 {
     int width = GetWidth();
     int height = GetHeight();
@@ -197,13 +197,15 @@ void JisuanProcessDib::biaoji(int T)
     bool stop = false;
 
     if (GetRGB()) {
+        this->erzhihua(T); ///图像二值化
+
         // 从左到右标号
-        for (int y = 1; y < height - 1; y++) {
+        for (int y = 1; y < height - 1; y++) { // 每行
             if (stop) // 判断连通区是否太多
                 break;
-            for (int x = 1; x < width - 1; x++) {
+            for (int x = 1; x < width - 1; x++) { // 每列
                 if (signCount > 250) {
-                    AfxMessageBox("连通区数目太多,请增大阈值");
+                    /*AfxMessageBox("连通区数目太多,请增大阈值");*/
                     stop = true;
                     break;
                 }
@@ -299,8 +301,8 @@ void JisuanProcessDib::biaoji(int T)
                         flag[signID]++;
                     }
                 } //end if
-            }
-        }
+            } //end 每列
+        } //end 每行
     }
     else {
         this->RgbToGray();
@@ -413,247 +415,40 @@ void JisuanProcessDib::biaoji(int T)
         } //end 每行
     }
 
-    delete p_temp;
-}
-//
-//{
-//    x_sign=0; 
-//    m_temp=0;
-//    x_temp=0;
-//    y_temp=0;
-//    stop=0;
-//    memset(flag,0,255);
-//    p_data=this->GetData ();   //取得原图的数据区指针
-//    wide=this->GetWidth ();  //取得原图的数据区宽度
-//    height=this->GetHeight ();   //取得原图的数据区高度
-//    if(m_pBitmapInfoHeader->biBitCount<9)    //灰度图像
-//    {
-//        p_temp=new BYTE[wide*height];//开辟一个临时内存区
-//        memset(p_temp,255,wide*height);
-//        //从左到右标号
-//        for(int j=1;j<height-1;j++)    // 每行
-//        {
-//            if(stop==1)//判断连通区是否太多
-//                break;
-//            for(int i=1;i<wide-1;i++)    // 每列
-//            {
-//                if(x_sign>250)
-//                {
-//                    AfxMessageBox("连通区数目太多,请增大阈值");
-//                    stop=1;
-//                    break;
-//                }
-//                if(*(p_data+(height-j-1)*wide+i)==0)//若当前点为黑点
-//                {
-//                    if(*(p_data+(height-j-1+1)*wide+i+1)==0)//右上
-//                    {
-//                        *(p_temp+(height-j-1)*wide+i)=*(p_temp+(height-j-1+1)*wide+i+1);
-//                        x_temp=*(p_temp+(height-j-1+1)*wide+i+1);
-//                        flag[x_temp]+=1;
-//                        if(*(p_data+(height-j-1)*wide+i-1)==0&&*(p_temp+(height-j-1)*wide+i-1)!=x_temp)//左前
-//                        {
-//                            y_temp=*(p_temp+(height-j-1)*wide+i-1);
-//                            for(int m=1;m<=height-1;m++)
-//                                for(int n=1;n<=wide-1;n++)
-//                                {
-//                                    if(*(p_temp+(height-m-1)*wide+n)==y_temp)
-//                                    {    
-//                                        flag[y_temp]=0;
-//                                        *(p_temp+(height-m-1)*wide+n)=x_temp;
-//                                        flag[x_temp]+=1;
-//                                    }
-//                                }
-//                        }//end//左前
-//                        if(*(p_data+(height-j-1+1)*wide+i-1)==0&&*(p_temp+(height-j-1+1)*wide+i-1)!=x_temp)//左上
-//                        {
-//                            y_temp=*(p_temp+(height-j-1+1)*wide+i-1);
-//                            for(int m=1;m<=height-1;m++)
-//                                for(int n=1;n<=wide-1;n++)
-//                                {
-//                                    if(*(p_temp+(height-m-1)*wide+n)==y_temp)
-//                                    {    
-//                                        flag[y_temp]=0;
-//                                        *(p_temp+(height-m-1)*wide+n)=x_temp;
-//                                        flag[x_temp]+=1;
-//                                    }
-//                                }
-//                        }//end//左上
-//                    }
-//                    else if(*(p_data+(height-j-1+1)*wide+i)==0)//正上
-//                    {
-//                        *(p_temp+(height-j-1)*wide+i)=*(p_temp+(height-j-1+1)*wide+i);
-//                        x_temp=*(p_temp+(height-j-1+1)*wide+i);
-//                        flag[x_temp]+=1;
-//                    }
-//                    else if(*(p_data+(height-j-1+1)*wide+i-1)==0)//左上
-//                    {
-//                        *(p_temp+(height-j-1)*wide+i)=*(p_temp+(height-j-1+1)*wide+i-1);
-//                        x_temp=*(p_temp+(height-j-1+1)*wide+i-1);
-//                        flag[x_temp]+=1;
-//                    }
-//                    else if(*(p_data+(height-j-1)*wide+i-1)==0)//左前
-//                    {
-//                        *(p_temp+(height-j-1)*wide+i)=*(p_temp+(height-j-1)*wide+i-1);
-//                        x_temp=*(p_temp+(height-j-1)*wide+i-1);
-//                        flag[x_temp]+=1;
-//                    }
-//                    else//没有
-//                    {                
-//                        ++x_sign;
-//                        m_temp=x_sign;
-//                        *(p_temp+(height-j-1)*wide+i)=m_temp;
-//                        flag[m_temp]=1;
-//                        
-//                    }
-//                }//end if
-//            }// 每列
-//        }//end 每行
-//    }
-//    else    //24位彩色
-//    {
-//        p_temp=new BYTE[wide*height];//开辟一个临时内存区
-//        memset(p_temp,255,wide*height);
-//        //从左到右标号
-//        for(int j=1;j<height-1;j++)    // 每行
-//        {
-//            if(stop==1)//判断连通区是否太多
-//                break;
-//            for(int i=1;i<wide-1;i++)    // 每列
-//            {
-//                if(x_sign>250)
-//                {
-//                    AfxMessageBox("连通区数目太多,请增大阈值");
-//                    stop=1;
-//                    break;
-//                }
-//                if(*(p_data+(height-j-1)*wide*3+i*3)==0)//若当前点为黑点
-//                {
-//                    
-//                    if(*(p_data+(height-j-1+1)*wide*3+(i+1)*3)==0)//右上
-//                    {
-//                        *(p_temp+(height-j-1)*wide+i)=*(p_temp+(height-j-1+1)*wide+(i+1));
-//                        x_temp=*(p_temp+(height-j-1+1)*wide+(i+1));
-//                        flag[x_temp]+=1;
-//                        if(*(p_data+(height-j-1)*wide*3+(i-1)*3)==0&&*(p_temp+(height-j-1)*wide+(i-1))!=x_temp)//左前
-//                        {
-//                            y_temp=*(p_temp+(height-j-1)*wide+(i-1));
-//                            for(int m=1;m<=height-1;m++)
-//                                for(int n=1;n<=wide-1;n++)
-//                                {
-//                                    if(*(p_temp+(height-m-1)*wide+n)==y_temp)
-//                                    {    
-//                                        flag[y_temp]=0;
-//                                        *(p_temp+(height-m-1)*wide+n)=x_temp;
-//                                        
-//                                        flag[x_temp]+=1;
-//                                    }
-//                                }
-//                        }//end//左前
-//                        if(*(p_data+(height-j-1+1)*wide*3+(i-1)*3)==0&&*(p_temp+(height-j-1+1)*wide+(i-1))!=x_temp)//左上
-//                        {
-//                            y_temp=*(p_temp+(height-j-1+1)*wide+(i-1));
-//                            for(int m=1;m<=height-1;m++)
-//                                for(int n=1;n<=wide-1;n++)
-//                                {
-//                                    if(*(p_temp+(height-m-1)*wide+n)==y_temp)
-//                                    {    
-//                                        flag[y_temp]=0;
-//                                        *(p_temp+(height-m-1)*wide+n)=x_temp;
-//                                        
-//                                        flag[x_temp]+=1;
-//                                    }
-//                                }
-//                        }//end//左上
-//                    }
-//                    else if(*(p_data+(height-j-1+1)*wide*3+i*3)==0)//正上
-//                    {
-//                        *(p_temp+(height-j-1)*wide+i)=*(p_temp+(height-j-1+1)*wide+i);
-//                        x_temp=*(p_temp+(height-j-1+1)*wide+i);
-//                        flag[x_temp]+=1;
-//                    }
-//                    else if(*(p_data+(height-j-1+1)*wide*3+(i-1)*3)==0)//左上
-//                    {
-//                        *(p_temp+(height-j-1)*wide+i)=*(p_temp+(height-j-1+1)*wide+(i-1));
-//                        x_temp=*(p_temp+(height-j-1+1)*wide+(i-1));
-//                        flag[x_temp]+=1;
-//                    }
-//                    else if(*(p_data+(height-j-1)*wide*3+(i-1)*3)==0)//左前
-//                    {
-//                        *(p_temp+(height-j-1)*wide+i)=*(p_temp+(height-j-1)*wide+i-1);
-//                        x_temp=*(p_temp+(height-j-1)*wide+(i-1));
-//                        flag[x_temp]+=1;
-//                    }
-//                    else//没有
-//                    {                
-//                        ++x_sign;
-//                        m_temp=x_sign;
-//                        *(p_temp+(height-j-1)*wide+i)=m_temp;
-//                        
-//                        flag[m_temp]=1;
-//                    }
-//                }//end if
-//            }// 每列
-//        }//end 每行
-//    }
-//}
+    count = 0;
+    if (!stop) {
+        // 区域统计
+        for (int i = 1; i <= signCount; i++) {
+            if (flag[i] != 0)
+                ++count;
+        }
 
-/***************************************************************/
-/*函数名称：LianTong(int T)                                         */
-/*函数类型：void                                               */
-/*函数参数：int T 二值化阈值                                    */
-/*功能：对连通区调整,输出每个连通区的面积。                       */
-/***************************************************************/
-void JisuanProcessDib::LianTong(int T)
-{
-    biaoji(T);  //调用标记函数
-    if(stop!=1)//判断连通区是否太多
-    {
-        int fg[255]={0};//定义一个数组
-        memset(fg,0,255);//初始化赋值都为0
-        int y_sign=0;
-        int m_Area=0;//定义一个面积
-        for(int i=0;i<255;i++)
-        {
-            if(flag[i]!=0)
-            {
-                if(fg[y_sign]==0)
-                {
-                    fg[y_sign]=flag[i];
-                    ++y_sign;
-                }            
-            }
-            m_Area+=flag[i];
-        }
-        SquareDlg  dlg;//输出对话框
-        dlg.m_number=y_sign;//输出连通区域个数
-        dlg.m_squareALL=m_Area;//输出连通区域的总积
-        CString ss[20];
-        //在对话框里输出每个连通区的面积（区域像素个数）
-        for(int i=0;i<y_sign;i++)
-        {
-            ss[i].Format("连通区：%3d  该区面积:%10.0d\r\n",i+1,fg[i]);
-            dlg.m_ShuChu+=ss[i];
-        }
-        dlg.DoModal();
-        for(int i=0;i<255;i++) //初试设置pp_area都为0
-        {
-            pppp[i].pp_area=0;
-        }
-        for(int t=1;t<=x_sign;t++)
-        {    pppp[t].pp_number=t;
-        for(int j=1;j<height-1;j++)
-            for(int i=1;i<wide-1;i++)
-            {
-                if(*(p_temp+(height-j-1)*wide+i)==t)
-                {
-                    pppp[t].pp_x=i;
-                    pppp[t].pp_y=j;
-                    pppp[t].pp_area=flag[t];
+        // 区域位置
+        for(int i = 0;i < 255; i++)
+            pppp[i].pp_area = 0;
+
+        int dibFactor = GetRGB() ? 1 : 3;
+        //int dibFactor = (m_pBitmapInfoHeader->biBitCount == 24) ? 3 : 1;
+        for (int t = 1; t <= signCount; t++) {
+            pppp[t].pp_number = t;
+            for (int y = 1; y < height - 1; y++) {
+                for (int x = 1; x < width - 1; x++) {
+                    if (p_temp[lineBytes * y + x * dibFactor] == t) { // 查找每个区域的位置
+                        pppp[t].pp_x = x;
+                        pppp[t].pp_y = height - y - 1;
+                        pppp[t].pp_area = flag[t];
+                        break;
+                    }
+                }
+
+                if (pppp[t].pp_area != 0)
                     break;
-                }                
             }
         }
-    }//end if(stop!=1)
+    }
+
+    delete p_temp;
+    return signCount;
 }
 
 /***************************************************************/
@@ -714,7 +509,7 @@ void JisuanProcessDib::ClearSMALL(int m_value)
 /***************************************************************/
 void JisuanProcessDib::Borderline()
 {
-    biaoji(100);  //调用标记函数
+    biaoji(0);  //调用标记函数
     LPBYTE    lpSrc;  // 指向源图像的指针
     LPBYTE    lpDst;    // 指向缓存图像的指针
     LPBYTE    temp;  // 指向缓存DIB图像的指针
@@ -844,7 +639,7 @@ void JisuanProcessDib::Borderline()
             //在对话框里输出每个连通区的周长（边界像素个数）
             for(int i=0;i<y_line;i++)
             {
-                ss[i].Format("连通区：%3d, 该区周长:%10.0d",i+1,fn[i]);
+                ss[i].Format("连通区：%3d  该区周长:%10.0d",i+1,fn[i]);
                 dlg.m_line+=ss[i];
             }
             dlg.DoModal();
@@ -1022,27 +817,28 @@ void JisuanProcessDib::Borderline()
 //将24位彩色图像转换为24位灰度图
 void JisuanProcessDib::RgbToGray()
 {
-    BYTE *p_data;     //原图数据区指针
-    int wide,height,DibWidth;    //原图长、宽、字节宽
-    p_data=this->GetData ();   //取得原图的数据区指针
-    wide=this->GetWidth ();   //取得原图的数据区宽度
-    height=this->GetHeight ();   //取得原图的数据区高度
-    DibWidth=this->GetDibWidthBytes();   //取得原图的每行字节数
-    for(int j=0;j<height;j++)    // 每行
-        for(int i=0;i<DibWidth;i+=3)    // 每列
-        {
+    if (GetRGB())
+        return;
+
+    int width = GetWidth();
+    int height = GetHeight();
+    int lineBytes = GetDibWidthBytes();
+    LPBYTE p_data = GetData();
+
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < lineBytes; x += 3) {
             BYTE* pbyBlue = p_data++;   //得到蓝色值
             BYTE* pbyGreen = p_data++;  //得到绿色值
-            BYTE* pbyRed = p_data++;    //得 到红色值
+            BYTE* pbyRed = p_data++;    //得到红色值
             BYTE r = *pbyRed;
             BYTE g = *pbyGreen;
             BYTE b = *pbyBlue;
-            int gray=0;
-            gray=(30*r+59*g+11*b)/100;        
-            *pbyBlue = gray;     
-            *pbyGreen = gray;    
-            *pbyRed = gray;            
+            int gray = (30 * r + 59 * g + 11 * b) /100;
+            *pbyBlue = gray;   
+            *pbyGreen = gray; 
+            *pbyRed = gray;
         }
+    }
 }
 
 //保存未处理的原图像
