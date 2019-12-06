@@ -138,6 +138,19 @@ void CDynSplitView2::OnDraw(CDC* pDC)
                 }
             }
         }
+
+        // 绘制面积
+        if (state3 == 2 && count != 0)
+        {
+            CClientDC dc(this);
+            dc.SetTextColor(100);
+            CString ss_Area[255];
+            for(int i = 1; i <= count; i++) {
+                if(CDibNew1->pppp[i].pp_area != 0)
+                    ss_Area[i].Format("%d", CDibNew1->pppp[i].pp_area);
+                dc.TextOut(CDibNew1->pppp[i].pp_x, CDibNew1->pppp[i].pp_y, ss_Area[i]);
+            }
+        } 
     }
 }
 
@@ -179,102 +192,6 @@ void CDynSplitView2::OnFilesave()
         state2=1;
     }
 }
-
-//计算面积消息函数
-void CDynSplitView2::OnAreajisuan() 
-{
-    clearmem();
-    
-    LPBYTE temp;
-    int i,j;
-    int wide,height;
-
-    CYuZhi Dlg;
-    Dlg.DoModal();
-    yuzhi_gray=Dlg.m_gray;
-    if(CDibNew1->m_pBitmapInfoHeader->biBitCount==24)
-    {
-         wide=CDibNew1->GetDibWidthBytes();
-         height=CDibNew1->GetHeight();
-         temp = new BYTE[wide*height];
-         memset(temp, (BYTE)255, wide * height);
-
-         CDibNew1->Baoliu(temp);
-         CDibNew1->RgbToGray();
-    }
-    CDibNew1->erzhihua(yuzhi_gray);///图像二值化
-
-    
-    CDibNew1->biaoji(yuzhi_gray);//标记、计算像素区
-    
-    if(CDibNew1->m_pBitmapInfoHeader->biBitCount==24)
-    {
-        LPBYTE  lpSrc,lpDst,temp2;
-        lpSrc=CDibNew1->GetData();
-        lpDst=temp;
-        temp2=lpSrc;
-        for(j=0;j<height;j++)
-            for(i=0;i<wide;i++)
-            {    
-                *lpSrc=*lpDst+*lpSrc;
-                if(*lpSrc>255)
-                    *lpSrc=255;
-                lpSrc++;
-                lpDst++;
-                
-                }
-            lpSrc=temp2;
-    }
-    
-    delete temp;
-    CClientDC dc(this);   
-    CDSplitDoc* pDoc = GetDocument();
-    ASSERT_VALID(pDoc);
-    if(!pDoc ->statedoc&&state2==1)
-    {
-         int m_scale=1;
-        BYTE* pBitmapData = CDibNew1->GetData();
-        LPBITMAPINFO pBitmapInfo = CDibNew1->GetInfo();
-        int bitmapHeight = CDibNew1->GetHeight();
-        int bitmapWidth = CDibNew1->GetWidth();
-        int scaledWidth = (int)(bitmapWidth * m_scale);
-        int scaledHeight = (int)(bitmapHeight * m_scale);
-        if (CDibNew1->GetRGB()) // Has a color table
-        {
-            CPalette * hPalette=CreateBitmapPalette(CDibNew1);
-            CPalette * hOldPalette =
-                dc.SelectPalette(hPalette, true);
-            dc.RealizePalette();
-            ::StretchDIBits(dc.GetSafeHdc(),0, 0, scaledWidth, scaledHeight,
-               0, 0, bitmapWidth, bitmapHeight,
-                pBitmapData, pBitmapInfo,
-                DIB_RGB_COLORS, SRCCOPY);
-            dc.SelectPalette(hOldPalette, true);
-            ::DeleteObject(hPalette);
-        }
-        else
-        {
-            
-            
-            
-            ::StretchDIBits(dc.GetSafeHdc(),0, 0, scaledWidth, scaledHeight,
-                0, 0, bitmapWidth, bitmapHeight,
-                pBitmapData, pBitmapInfo,
-                DIB_RGB_COLORS, SRCCOPY);
-            
-        }
-    }
-
-    dc.SetTextColor(100);
-    CString ss_Area[255];
-    for( i=0;i<255;i++)
-    {
-        if(CDibNew1->pppp[i].pp_area!=0)
-        ss_Area[i].Format("%d",CDibNew1->pppp[i].pp_area);
-        dc.TextOut(CDibNew1->pppp[i].pp_x,CDibNew1->pppp[i].pp_y,ss_Area[i]);
-    }
-}
-
 
 //面积消除消息函数
 void CDynSplitView2::OnXiaochusmall() 
@@ -394,7 +311,6 @@ void CDynSplitView2::OnFollowline()
     }
 }
 
-
 //显示标记消息函数
 void CDynSplitView2::OnMarkPart() 
 {
@@ -415,7 +331,27 @@ void CDynSplitView2::OnMarkPart()
     }
 }
 
-// 统计区域面积
+//计算面积消息函数
+void CDynSplitView2::OnAreajisuan() 
+{
+    clearmem();
+
+    CYuZhi dlg;
+    dlg.m_gray = 100;
+    dlg.DoModal();
+
+    count = 0;
+    count = CDibNew1->biaoji(dlg.m_gray); //标记、计算像素区
+    if (count) {
+        state3 = 2;
+        Invalidate();
+    }
+    else {
+        AfxMessageBox("连通区数目太多,请增大阈值"); 
+    }
+}
+
+// 提示区域面积
 void CDynSplitView2::ShowSquare(int count)
 {
     if (count != 0) {
