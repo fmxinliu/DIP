@@ -151,6 +151,19 @@ void CDynSplitView2::OnDraw(CDC* pDC)
                 dc.TextOut(CDibNew1->pppp[i].pp_x, CDibNew1->pppp[i].pp_y, ss_Area[i]);
             }
         } 
+
+        // 绘制周长
+        if (state3 == 3 && count != 0)
+        {
+            CClientDC dc(this);
+            dc.SetTextColor(100);
+            CString ss_line[255];
+            for(int i = 1; i <= count; i++) {
+                if(CDibNew1->pppp[i].pp_line != 0)
+                    ss_line[i].Format("%d", CDibNew1->pppp[i].pp_line);
+                dc.TextOut(CDibNew1->pppp[i].pp_x, CDibNew1->pppp[i].pp_y, ss_line[i]);
+            }
+        } 
     }
 }
 
@@ -246,68 +259,24 @@ void CDynSplitView2::OnXiaochusmall()
 void CDynSplitView2::OnFollowline() 
 {
     clearmem();
+    
     LPBYTE temp;
     int i,j;
     int wide,height;
 
-    CYuZhi Dlg;
-    Dlg.DoModal();
-    yuzhi_gray=Dlg.m_gray;
-    if(CDibNew1->m_pBitmapInfoHeader->biBitCount==24)
-    {
-         wide=CDibNew1->GetDibWidthBytes();
-         height=CDibNew1->GetHeight();
-         temp = new BYTE[wide*height];
-         memset(temp, (BYTE)255, wide * height);
+    CYuZhi dlg;
+    dlg.m_gray = 100;
+    dlg.DoModal();
+    yuzhi_gray=dlg.m_gray;
 
-         CDibNew1->Baoliu(temp);
-         CDibNew1->RgbToGray();
+    count = 0;
+    count = CDibNew1->Borderline(dlg.m_gray); //标记、计算像素区
+    if (count) {
+        state3 = 3;
+        Invalidate();
     }
-
-    CDibNew1->erzhihua(yuzhi_gray);//图像二值化
-    CDibNew1->xiaochugulidianHEI();//消除孤立点黑像素
-    CDibNew1->Borderline();//边界跟踪
-    CClientDC dc(this);   
-    CDSplitDoc* pDoc = GetDocument();
-    ASSERT_VALID(pDoc);
-    if(!pDoc ->statedoc&&state2==1)
-    {
-        int m_scale=1;
-        BYTE* pBitmapData = CDibNew1->GetData();
-        LPBITMAPINFO pBitmapInfo = CDibNew1->GetInfo();
-        int bitmapHeight = CDibNew1->GetHeight();
-        int bitmapWidth = CDibNew1->GetWidth();
-        int scaledWidth = (int)(bitmapWidth * m_scale);
-        int scaledHeight = (int)(bitmapHeight * m_scale);
-        if (CDibNew1->GetRGB()) // Has a color table
-        {
-            CPalette * hPalette=CreateBitmapPalette(CDibNew1);
-            CPalette * hOldPalette =
-                dc.SelectPalette(hPalette, true);
-            dc.RealizePalette();
-            ::StretchDIBits(dc.GetSafeHdc(),0, 0, scaledWidth, scaledHeight,
-                0, 0, bitmapWidth, bitmapHeight,
-                pBitmapData, pBitmapInfo,
-                DIB_RGB_COLORS, SRCCOPY);
-            dc.SelectPalette(hOldPalette, true);
-            ::DeleteObject(hPalette);
-        }
-        else
-        {
-            ::StretchDIBits(dc.GetSafeHdc(),0, 0, scaledWidth, scaledHeight,
-                0, 0, bitmapWidth, bitmapHeight,
-                pBitmapData, pBitmapInfo,
-                DIB_RGB_COLORS, SRCCOPY);
-        }
-    }
-
-    dc.SetTextColor(100);
-    CString ss_line[255];
-    for( i=0;i<255;i++)
-    {
-        if(CDibNew1->pppp[i].pp_line!=0)
-        ss_line[i].Format("%d",CDibNew1->pppp[i].pp_line);
-        dc.TextOut(CDibNew1->pppp[i].pp_x,CDibNew1->pppp[i].pp_y,ss_line[i]);
+    else {
+        AfxMessageBox("连通区数目太多,请增大阈值"); 
     }
 }
 

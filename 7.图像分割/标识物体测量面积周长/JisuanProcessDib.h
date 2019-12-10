@@ -30,7 +30,9 @@ class JisuanProcessDib : public CDib
 public:
     void Baoliu(LPBYTE temp);
     void RgbToGray();
-    void Borderline();
+    int  Borderline(int T);
+    void Lunkuotiqu(int T);
+    void Lunkuotiqu2(int T);
     void ClearSMALL(int m_value);
     int  biaoji(int T);
     void xiaochugulidianBAI();
