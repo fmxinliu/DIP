@@ -33,28 +33,18 @@ public:
     int  Borderline(int T);
     void Lunkuotiqu(int T);
     void Lunkuotiqu2(int T);
-    void ClearSMALL(int m_value);
-    int  biaoji(int T);
+    int  ClearSMALL(int T1, int T2);
+    int  biaoji(int T, LPBYTE pdata = nullptr);
     void xiaochugulidianBAI();
     void xiaochugulidianHEI();
     void erzhihua(int yuzhi_gray);
              JisuanProcessDib();
     virtual ~JisuanProcessDib();
 
-    BYTE *p_data;     //原图数据区指针
-    int wide,height;    //原图长、宽
 ////////////////////////////////////////////////////
-    object pppp[255];//*pppp,
-
-    int x_sign;
-    int flag[255];
-    int m_temp;
-    int x_temp;
-    int y_temp;
-    BYTE *p_temp;
-
-    int stop;
-    int count;
+    object pppp[255]; // 区域标号位置
+    int flag[255]; // 区域面积
+    int count; // 区域个数
 ////////////////////////////////////////////////////
 
 };

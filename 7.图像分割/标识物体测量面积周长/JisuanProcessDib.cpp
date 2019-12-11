@@ -20,12 +20,6 @@ static char THIS_FILE[]=__FILE__;
 JisuanProcessDib::JisuanProcessDib()
 {
     count = 0;
-    x_sign=0;
-    m_temp=0;
-    x_temp=0;
-    y_temp=0;
-    p_temp=0;
-    stop=0;
 }
 
 JisuanProcessDib::~JisuanProcessDib()
@@ -78,9 +72,9 @@ void JisuanProcessDib::erzhihua(int T)
 /***************************************************************/
 void JisuanProcessDib::xiaochugulidianHEI()
 {
-    p_data=this->GetData ();   //取得原图的数据区指针
-    wide=this->GetWidth ();  //取得原图的数据区宽度
-    height=this->GetHeight ();   //取得原图的数据区高度
+    LPBYTE p_data=this->GetData ();   //取得原图的数据区指针
+    int wide=this->GetWidth ();  //取得原图的数据区宽度
+    int height=this->GetHeight ();   //取得原图的数据区高度
     if(m_pBitmapInfoHeader->biBitCount<9)    //灰度图像
     {
         for(int j=1;j<height-1;j++)    // 每行
@@ -130,9 +124,9 @@ void JisuanProcessDib::xiaochugulidianHEI()
 /***************************************************************/
 void JisuanProcessDib::xiaochugulidianBAI()
 {
-    p_data=this->GetData ();   //取得原图的数据区指针
-    wide=this->GetWidth ();  //取得原图的数据区宽度
-    height=this->GetHeight ();   //取得原图的数据区高度
+    LPBYTE p_data=this->GetData ();   //取得原图的数据区指针
+    int wide=this->GetWidth ();  //取得原图的数据区宽度
+    int height=this->GetHeight ();   //取得原图的数据区高度
     if(m_pBitmapInfoHeader->biBitCount<9)    //灰度图像
     {
         for(int j=1;j<height-1;j++)    // 每行
@@ -179,9 +173,10 @@ void JisuanProcessDib::xiaochugulidianBAI()
 /*函数名称：biaoji(int T)                                       */
 /*函数类型：int                                                */
 /*函数参数：int T 二值化阈值                                    */
+/*         LPBYTE pdata 标记指针                               */
 /*功能：二值化，对图像标记,划分成不同的连通区域。                  */
 /***************************************************************/
-int JisuanProcessDib::biaoji(int T)
+int JisuanProcessDib::biaoji(int T, LPBYTE pdata)
 {
     int width = GetWidth();
     int height = GetHeight();
@@ -445,6 +440,9 @@ int JisuanProcessDib::biaoji(int T)
                     break;
             }
         }
+
+        if (pdata != nullptr) 
+            memcpy(pdata, p_temp, size);
     }
 
     delete p_temp;
@@ -452,54 +450,57 @@ int JisuanProcessDib::biaoji(int T)
 }
 
 /***************************************************************/
-/*函数名称：ClearSMALL(int m_value)                             */
-/*函数类型：void                                                */
-/*参数：int m_value，用户给定的阈值                              */
+/*函数名称：ClearSMALL(int T1, int T2)                          */
+/*函数类型：int                                                 */
+/*参数：int T1，二值化阈值                                       */
+/*     int T2，面积过滤阈值                                      */
 /*功能：消除面积小于给定的阈值的小区域。                           */
 /***************************************************************/
-void JisuanProcessDib::ClearSMALL(int m_value)
-{
-    biaoji(m_value);  //调用标记函数
-    if(m_pBitmapInfoHeader->biBitCount<9)    //灰度图像
-    {
-        if(stop!=1)//判断连通区是否太多
-        {
-            for(int i=1;i<=x_sign;i++)
-            {
-                if(flag[i]<m_value)//判断连通区的面积（像素个数）是否消除
-                {
-                    for(int m=1;m<height-1;m++)
-                        for(int n=1;n<wide-1;n++)
-                        {
-                            if(*(p_temp+(height-m-1)*wide+n)==i)
-                                *(p_data+(height-m-1)*wide+n)=255;
-                        }        
-                }
-            }
-        }
-    }
-    else    //24位彩色
-    {
-        if(stop!=1)//判断连通区是否太多
-        {
-            for(int i=1;i<=x_sign;i++)
-            {
-                if(flag[i]<m_value)//判断连通区的面积（像素个数）是否消除
-                {
-                    for(int m=1;m<height-1;m++)
-                        for(int n=1;n<wide-1;n++)
-                        {
-                            if(*(p_temp+(height-m-1)*wide+n)==i)
-                            {
-                                *(p_data+(height-m-1)*wide*3+n*3)=255;
-                                *(p_data+(height-m-1)*wide*3+n*3+1)=255;
-                                *(p_data+(height-m-1)*wide*3+n*3+2)=255;
+int JisuanProcessDib::ClearSMALL(int T1, int T2)
+{ 
+    int width = GetWidth();
+    int height = GetHeight();
+    int lineBytes = GetDibWidthBytes();
+    int size = lineBytes * height;
+    LPBYTE p_data = GetData();
+    LPBYTE p_temp = new BYTE[size];
+
+    int count = biaoji(T1, p_temp); // 标记
+    if (count > 0) {
+        if(m_pBitmapInfoHeader->biBitCount < 9) {   //灰度图像
+            for (int i = 1; i < count; i++) {
+                if(flag[i] > 0 && flag[i] < T2) { // 判断连通区的面积（像素个数）是否消除
+                    for(int y = 1; y < height - 1; y++) {
+                        for(int x = 1; x < width - 1; x++) {
+                            if (p_temp[lineBytes * (height - y - 1) + x] == i) {// 标号
+                                p_data[lineBytes * (height - y - 1) + x] = 255;
+                                pppp[i].pp_area = 0;
                             }
-                        }        
+                        } 
+                    }
+                }
+            }
+        }
+        else { //24位彩色
+            for (int i = 1; i < count; i++) {
+                if(flag[i] < T2) { // 判断连通区的面积（像素个数）是否消除
+                    for(int y = 1; y < height - 1; y++) {
+                        for(int x = 1; x < width - 1; x++) {
+                            if (p_temp[lineBytes * (height - y - 1) + x * 3] == i) {// 标号
+                                p_data[lineBytes * (height - y - 1) + x * 3] = 255;
+                                p_data[lineBytes * (height - y - 1) + x * 3 + 1] = 255;
+                                p_data[lineBytes * (height - y - 1) + x * 3 + 2] = 255;
+                                pppp[i].pp_area = 0;
+                            }
+                        } 
+                    }
                 }
             }
         }
     }
+
+    delete p_temp;
+    return count;
 }
 
 /***************************************************************/

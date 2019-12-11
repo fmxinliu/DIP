@@ -211,47 +211,17 @@ void CDynSplitView2::OnXiaochusmall()
 {
     clearmem();
 
-    LPBYTE temp;
-    int i,j;
-    int wide,height;
-
-    CYuZhi Dlg;
-    Dlg.DoModal();
-    yuzhi_gray=Dlg.m_gray;
-    if(CDibNew1->m_pBitmapInfoHeader->biBitCount==24)
-    {
-         wide=CDibNew1->GetDibWidthBytes();
-         height=CDibNew1->GetHeight();
-         temp = new BYTE[wide*height];
-         memset(temp, (BYTE)255, wide * height);
-         CDibNew1->Baoliu(temp);
-         CDibNew1->RgbToGray();
+    CYuZhi dlg;
+    dlg.m_gray = 100;
+    dlg.DoModal();
+    DELSMALL  dlg1;
+    dlg1.m_delsmall = 60;
+    dlg1.DoModal();
+    count = CDibNew1->ClearSMALL(dlg.m_gray, dlg1.m_delsmall); //消除小区域
+    if (count > 0) {
+        state3 = 2;
+        Invalidate();
     }
-    CDibNew1->erzhihua(yuzhi_gray); //图像二值化
-
-    if(CDibNew1->m_pBitmapInfoHeader->biBitCount==24)
-    {
-        LPBYTE  lpSrc,lpDst,temp2;
-        lpSrc=CDibNew1->GetData();
-        lpDst=temp;
-        temp2=lpSrc;
-        for(j=0;j<height;j++)
-            for(i=0;i<wide;i++)
-            {    
-                *lpSrc=*lpDst+*lpSrc;
-                if(*lpSrc>255)
-                    *lpSrc=255;
-                lpSrc++;
-                lpDst++;
-                }
-            lpSrc=temp2;
-    }
-    int m_value;
-    DELSMALL  Dlg1;
-    Dlg1.DoModal();
-    m_value=Dlg1.m_delsmall;
-    CDibNew1->ClearSMALL(m_value); //消除小区域     
-     Invalidate();
 }
 
 
@@ -260,10 +230,6 @@ void CDynSplitView2::OnFollowline()
 {
     clearmem();
     
-    LPBYTE temp;
-    int i,j;
-    int wide,height;
-
     CYuZhi dlg;
     dlg.m_gray = 100;
     dlg.DoModal();
