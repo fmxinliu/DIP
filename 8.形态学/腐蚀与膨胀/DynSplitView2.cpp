@@ -212,7 +212,7 @@ void CDynSplitView2::OnQuanfangwei()
     clearmem();
     //CDibNew1->Shuipingfushi();
     //CDibNew1->ChuiZhiFuShi();
-    CDibNew1->Quanfangxiangfushi();             //调用全方位腐蚀函数
+    CDibNew1->Quanfangxiangfushi();             //调用全方向腐蚀函数
     Invalidate();
 }
 
@@ -223,19 +223,17 @@ void CDynSplitView2::OnShuipingpengzhang()
     // TODO: Add your command handler code here
     clearmem();
     CDibNew1->Shuipingpengzhang();             //调用水平膨胀函数
-     Invalidate();
+    Invalidate();
 }
 
 
 /*垂直膨胀消息映射*/
 void CDynSplitView2::OnChuizhipengzhang() 
 {
-     //TODO: Add your command handler code here
-    
-    //初始化图像数据
+    //TODO: Add your command handler code here
     clearmem();
     CDibNew1->Chuizhipengzhang();             //调用垂直膨胀函数
-     Invalidate();
+    Invalidate();
 }
 
 
@@ -244,8 +242,10 @@ void CDynSplitView2::OnQuanfangxiangpengzhang()
 {
     // TODO: Add your command handler code here
     clearmem();
+    //CDibNew1->Shuipingpengzhang();
+    //CDibNew1->Chuizhipengzhang();
     CDibNew1->Quanfangxiangpengzhang();      //调用全方向膨胀函数
-     Invalidate();
+    Invalidate();
 }
 
 
