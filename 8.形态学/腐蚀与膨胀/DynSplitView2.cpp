@@ -205,7 +205,7 @@ void CDynSplitView2::OnShuipingfushi()
 }
 
 
-/*全方向腐蚀消息映射*/
+/*全方向腐蚀消息映射(去除小物体，平滑大物体边界)*/
 void CDynSplitView2::OnQuanfangwei() 
 {
     // TODO: Add your command handler code here
@@ -257,7 +257,7 @@ void CDynSplitView2::OnKaiqi()
     clearmem();
     CDibNew1->Quanfangxiangfushi(); 
     CDibNew1->Quanfangxiangpengzhang();     //调用全方向开启函数
-     Invalidate();
+    Invalidate();
 }
 
 
@@ -268,8 +268,8 @@ void CDynSplitView2::OnBihe()
     // TODO: Add your command handler code here
     clearmem();
     CDibNew1->Quanfangxiangpengzhang(); 
-    CDibNew1->Quanfangxiangfushi();         //调用全方向开启函数
-     Invalidate();
+    CDibNew1->Quanfangxiangfushi();         //调用全方向闭合函数
+    Invalidate();
 }
 
 
