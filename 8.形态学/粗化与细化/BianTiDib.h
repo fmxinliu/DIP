@@ -11,8 +11,5 @@ public:
     void Zhongzhoubianhuan();
     void Cuhua();
     void Xihua();
-
-protected:
-    
 };
 #endif

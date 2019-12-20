@@ -217,5 +217,5 @@ void CDynSplitView2::OnZhongzhoubianhuan()
     // TODO: Add your command handler code here
     clearmem();
     CDibNew1->Zhongzhoubianhuan();      //调用中轴变换处理函数
-     Invalidate();
+    Invalidate();
 }
