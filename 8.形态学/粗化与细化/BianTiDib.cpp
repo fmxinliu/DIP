@@ -303,59 +303,26 @@ void BianTiDib::Xihua()
 /***************************************************************/
 void BianTiDib::Cuhua()
 {
-    // 循环变量
-    LONG i;
-    LONG j;
-    // 指向DIB象素指针
-    LPBYTE p_data;
-    // 找到DIB图像象素起始位置
-    p_data = this->GetData();
-    if(m_pBitmapInfoHeader->biBitCount<9)//灰度图像
-    {
-        // DIB的宽度
-        LONG wide = GetWidth();
-        // DIB的高度
-        LONG height = GetHeight();
-        // 对各像素进行灰度转换
-        for (j = 0; j < height; j ++)
-        {
-            for (i = 0; i < wide; i ++)
-            {
-                // 对像素各颜色分量进行二值化求补处理
-                unsigned char temp = *((unsigned char *)p_data + wide * j +i);
-                if (temp > 127)
-                    *((unsigned char *)p_data + wide * j + i) = 0;
-                else
-                    *((unsigned char *)p_data + wide * j + i) = 255;
-            }
-        }
-        // 在求补后再对图象进行细化
-        Xihua(); 
-    }
-    else//24位真彩色
-    {
-        // DIB的宽度
-        LONG wide = GetDibWidthBytes();
-        // DIB的高度
-        LONG height = GetHeight();
-        // 对各像素进行灰度转换
-        for (j = 0; j < height; j ++)
-        {
-            for (i = 0; i < wide; i ++)
-            {
-                // 对像素各颜色分量进行二值化求补处理
-                unsigned char temp = *((unsigned char *)p_data + wide * j +i);
-                if (temp > 127)
-                    *((unsigned char *)p_data + wide * j + i) = 0;
-                else
-                    *((unsigned char *)p_data + wide * j + i) = 255;                      
-            }
-        }
-        // 在求补后再对图象进行细化
-        Xihua(); 
-    }
-}
+    // 1.先求图像补集
+    LONG width = GetWidth();     // DIB的宽度
+    LONG height = GetHeight();   // DIB的高度
+    LONG dibWidth = GetDibWidthBytes();   // 取得原图的每行字节数(4字节对齐)
+    LONG size = dibWidth * height;
 
+    LPBYTE p_data = GetData(); // 指向DIB像素指针
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            LONG offset = dibWidth * y + x;
+            if (p_data[offset] > 127)
+                p_data[offset] = 0;
+            else
+                p_data[offset] = 255;
+        }
+    }
+
+    // 2.在求补后图像上再进行细化
+    Xihua();
+}
 
 
 ///***************************************************************/           

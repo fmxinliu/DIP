@@ -207,7 +207,7 @@ void CDynSplitView2::OnCuhua()
     // TODO: Add your command handler code here
     clearmem();
     CDibNew1->Cuhua();                  //调用粗化处理函数
-     Invalidate();
+    Invalidate();
 }
 
 
