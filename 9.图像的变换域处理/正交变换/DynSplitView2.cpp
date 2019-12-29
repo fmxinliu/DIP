@@ -17,66 +17,82 @@ static char THIS_FILE[] = __FILE__;
 IMPLEMENT_DYNCREATE(CDynSplitView2, CView)
 
 CDynSplitView2::CDynSplitView2()
-{state2=0;
+{
+    state2=0;
+    p_bihed = 0;
 }
 
+CDynSplitView2::~CDynSplitView2()
+{
+    free(p_bihed);
+}
 
 //8位彩色图像初始化
 void CDynSplitView2::clearmem()
 {
     CDSplitDoc* pDoc = GetDocument();
     ASSERT_VALID(pDoc);
-    pDoc ->statedoc=0;
+    pDoc->statedoc=0;
     state2=1;
     CDibNew1=&pDoc->CDibNew;
     CDib1=&pDoc->CDib;
-long int  size=CDib1->GetHeight()*CDib1->GetWidth();
-memcpy(CDibNew1->m_pData,CDib1->m_pData,size);
-//memset(CDibNew1->m_pData,0,CDibNew1->GetWidth()*CDibNew1->GetHeight());
-
+    long int  size=CDib1->GetHeight()*CDib1->GetWidth();
+    memcpy(CDibNew1->m_pData,CDib1->m_pData,size);
+    //memset(CDibNew1->m_pData,0,CDibNew1->GetWidth()*CDibNew1->GetHeight());
 }
+
+//24位彩色图像初始化
+void CDynSplitView2::clearmem2()
+{
+    CDSplitDoc* pDoc = GetDocument();
+    ASSERT_VALID(pDoc);
+    pDoc->statedoc=0;
+    state2=1;
+    CDibNew1=&pDoc->CDibNew;
+    CDib1=&pDoc->CDib;
+    long int  size=CDib1->GetHeight()*CDib1->GetWidth();
+    memcpy(CDibNew1->m_pData1,CDib1->m_pData1,size);
+}
+
 
 CPalette * CDynSplitView2::CreateBitmapPalette(ZhengJiaoBianHuanDib * pBitmap)
-    {
-        struct
-        {
-            WORD Version;
-            WORD NumberOfEntries;
-            PALETTEENTRY aEntries[256];
-        } palette = { 0x300, 256 };
-        
-        RGBQUAD buf[256];
-        for (int k=0;k<256;k++)
-            
-        {
-            buf[k].rgbBlue=k;
-            buf[k].rgbGreen=k;
-            buf[k].rgbRed=k;
-            buf[k].rgbReserved=0;
-            
-        }
-    
-        UINT numberOfColors = 256;
-        
-        for(UINT x=0; x<numberOfColors; ++x)
-        {
-            palette.aEntries[x].peRed =buf[x].rgbBlue;
-                 
-            palette.aEntries[x].peGreen =buf[x].rgbGreen;
-                
-            palette.aEntries[x].peBlue =buf[x].rgbRed;
-            
-            palette.aEntries[x].peFlags = buf[x].rgbReserved;
-        }
-        
-            hPalette.CreatePalette((LPLOGPALETTE)&palette);
-        //CPalette hPale=&hPalette;
-        return &hPalette;
-    }
-
-CDynSplitView2::~CDynSplitView2()
 {
+    struct
+    {
+        WORD Version;
+        WORD NumberOfEntries;
+        PALETTEENTRY aEntries[256];
+    } palette = { 0x300, 256 };
+        
+    RGBQUAD buf[256];
+    for (int k=0;k<256;k++)
+            
+    {
+        buf[k].rgbBlue=k;
+        buf[k].rgbGreen=k;
+        buf[k].rgbRed=k;
+        buf[k].rgbReserved=0;
+            
+    }
+    
+    UINT numberOfColors = 256;
+        
+    for(UINT x=0; x<numberOfColors; ++x)
+    {
+        palette.aEntries[x].peRed =buf[x].rgbBlue;
+                 
+        palette.aEntries[x].peGreen =buf[x].rgbGreen;
+                
+        palette.aEntries[x].peBlue =buf[x].rgbRed;
+            
+        palette.aEntries[x].peFlags = buf[x].rgbReserved;
+    }
+        
+    hPalette.CreatePalette((LPLOGPALETTE)&palette);
+    //CPalette hPale=&hPalette;
+    return &hPalette;
 }
+
 CDSplitDoc* CDynSplitView2::GetDocument() // non-debug version is inline
 {
     ASSERT(m_pDocument->IsKindOf(RUNTIME_CLASS(CDSplitDoc)));
@@ -92,6 +108,9 @@ BEGIN_MESSAGE_MAP(CDynSplitView2, CView)
     ON_COMMAND(ID_LISANYUXUAN, OnLisanyuxuan)
     ON_COMMAND(ID_WALSH, OnWalsh)
     //}}AFX_MSG_MAP
+    ON_COMMAND(ID_QuickForuier_Origin, &CDynSplitView2::OnQuickforuierOrigin)
+    ON_COMMAND(ID_QuickForuier_TransImpl1, &CDynSplitView2::OnQuickforuierTransimpl1)
+    ON_COMMAND(ID_QuickForuier_TransImpl2, &CDynSplitView2::OnQuickforuierTransimpl2)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -101,17 +120,17 @@ void CDynSplitView2::OnDraw(CDC* pDC)
 {    
     CDSplitDoc* pDoc = GetDocument();
     ASSERT_VALID(pDoc);
-    if(!pDoc ->statedoc&&state2==1)
+    if(!pDoc->statedoc && state2==1)
     {
         LPBITMAPINFO pBitmapInfo = CDibNew1->GetInfo();
-      RGBQUAD* m_pRGB=CDibNew1->GetRGB();
-       BYTE* pBitmapData;
+        RGBQUAD* m_pRGB=CDibNew1->GetRGB();
+        BYTE* pBitmapData;
         if(CDibNew1->byBitCount==8) //灰度图像
-          pBitmapData = CDibNew1->GetData();
+            pBitmapData = CDibNew1->GetData();
         else//24位真彩色
         {
             pBitmapData = CDibNew1->GetData2();
-          pBitmapInfo->bmiHeader.biBitCount=8;
+            pBitmapInfo->bmiHeader.biBitCount=8;
          }
         int bitmapHeight = CDibNew1->GetHeight();
         int bitmapWidth = CDibNew1->GetWidth();
@@ -120,38 +139,38 @@ void CDynSplitView2::OnDraw(CDC* pDC)
         unsigned char *pBit;
         char buf[256][3];
         
-        for (int k=0;k<256;k++)
-            for(int kk=0;kk<3;kk++)
-        {
-            buf[k][kk]=k;
-            
+        for (int k=0;k<256;k++) {
+            for(int kk=0;kk<3;kk++) {
+                buf[k][kk]=k;  
+            }
         }
-        LPBITMAPINFO p_bihed;
+
+        free(p_bihed);
         p_bihed=(LPBITMAPINFO)malloc(sizeof(BITMAPINFO)+256*3+1024);
         memcpy(p_bihed,pBitmapInfo,sizeof(BITMAPINFO));
         pBit=(unsigned char*)p_bihed+sizeof(BITMAPINFO);
         m_pRGB = (RGBQUAD*)pBit;
-        memcpy(pBit,buf,256*3);
+        memcpy(pBit, buf, 256*3);
         p_bihed->bmiHeader.biBitCount=8;
         p_bihed->bmiHeader.biSizeImage=bitmapHeight*bitmapWidth;
         
+        pBitmapInfo = p_bihed;
 
-        pBitmapInfo=p_bihed;
 //        if (CDibNew1->GetRGB()) // Has a color table
         {
             CPalette * hPalette=CreateBitmapPalette(CDibNew1);
-            CPalette * hOldPalette =
-                pDC->SelectPalette(hPalette, true);
+            CPalette * hOldPalette = pDC->SelectPalette(hPalette, true);
             pDC->RealizePalette();
             ::StretchDIBits(pDC->GetSafeHdc(),0, 0, bitmapWidth, bitmapHeight,
-               0, 0, bitmapWidth, bitmapHeight,
+                0, 0, bitmapWidth, bitmapHeight,
                 pBitmapData, pBitmapInfo,
                 DIB_RGB_COLORS, SRCCOPY);
             pDC->SelectPalette(hOldPalette, true);
             hPalette->DeleteObject();
         }
-            if(CDibNew1->byBitCount==24) 
-        pBitmapInfo->bmiHeader.biBitCount=24;
+
+        if(CDibNew1->byBitCount==24) 
+            pBitmapInfo->bmiHeader.biBitCount=24;
     }
 }
 
@@ -196,15 +215,6 @@ void CDynSplitView2::OnFilesave()
     }
 }
 
-void CDynSplitView2::OnQuickForuier() //对图像进行傅立叶变换
-{
-    // TODO: Add your command handler code here
-    clearmem();
-    if(CDibNew1->byBitCount==24) 
-         clearmem2();
-    CDibNew1->QuickFourier();
-    Invalidate();    
-}
 
 void CDynSplitView2::OnLisanyuxuan() //对图像进行离散余弦变换
 {
@@ -232,7 +242,6 @@ void CDynSplitView2::OnLisanyuxuan() //对图像进行离散余弦变换
         // 更新视图
         Invalidate();
     }
-
 }
 
 void CDynSplitView2::OnWalsh() //对图像进行沃尔什变换
@@ -261,19 +270,38 @@ void CDynSplitView2::OnWalsh() //对图像进行沃尔什变换
         // 更新视图
         Invalidate();
     }
-    
+}
+
+void CDynSplitView2::OnQuickForuier() //对图像进行傅立叶变换
+{
+    // TODO: Add your command handler code here
+}
+
+void CDynSplitView2::OnQuickforuierOrigin()
+{
+    clearmem();
+    if(CDibNew1->byBitCount==24) 
+        clearmem2();
+    CDibNew1->QuickFourier();
+    Invalidate(); 
 }
 
 
-//24位彩色图像初始化
-void CDynSplitView2::clearmem2()
+void CDynSplitView2::OnQuickforuierTransimpl1()
 {
-    CDSplitDoc* pDoc = GetDocument();
-    ASSERT_VALID(pDoc);
-    pDoc ->statedoc=0;
-    state2=1;
-    CDibNew1=&pDoc->CDibNew;
-    CDib1=&pDoc->CDib;
-    long int  size=CDib1->GetHeight()*CDib1->GetWidth();
-    memcpy(CDibNew1->m_pData1,CDib1->m_pData1,size);
+    clearmem();
+    if(CDibNew1->byBitCount==24) 
+        clearmem2();
+    CDibNew1->QuickFourier1();
+    Invalidate(); 
+}
+
+
+void CDynSplitView2::OnQuickforuierTransimpl2()
+{
+    clearmem();
+    if(CDibNew1->byBitCount==24) 
+        clearmem2();
+    CDibNew1->QuickFourier2();
+    Invalidate(); 
 }

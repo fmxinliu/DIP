@@ -1,5 +1,5 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by DSplit.rc
 //
 #define IDD_ABOUTBOX                    100
@@ -16,6 +16,14 @@
 #define ID_QuickForuier                 32778
 #define ID_LISANYUXUAN                  32779
 #define ID_WALSH                        32780
+#define ID_32781                        32781
+#define ID_Menu                         32782
+#define ID_32783                        32783
+#define ID_32784                        32784
+#define ID_32785                        32785
+#define ID_QuickForuier_Origin          32786
+#define ID_QuickForuier_TransImpl1      32787
+#define ID_QuickForuier_TransImpl2      32788
 
 // Next default values for new objects
 // 
@@ -23,7 +31,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        132
-#define _APS_NEXT_COMMAND_VALUE         32781
+#define _APS_NEXT_COMMAND_VALUE         32789
 #define _APS_NEXT_CONTROL_VALUE         1000
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

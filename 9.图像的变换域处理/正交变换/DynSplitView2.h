@@ -25,13 +25,14 @@ public:
 // Operations
 public:
     void clearmem2();
-        CPalette *CreateBitmapPalette( ZhengJiaoBianHuanDib* pBitmap);
-         CString filename;
-        ZhengJiaoBianHuanDib *CDibNew1;
-        CDib *CDib1;
-        CPalette hPalette;
-        int state2;
-        void clearmem();
+    CPalette *CreateBitmapPalette( ZhengJiaoBianHuanDib* pBitmap);
+    CString filename;
+    ZhengJiaoBianHuanDib *CDibNew1;
+    CDib *CDib1;
+    CPalette hPalette;
+    LPBITMAPINFO p_bihed;
+    int state2;
+    void clearmem();
 
 // Overrides
     // ClassWizard generated virtual function overrides
@@ -58,6 +59,10 @@ protected:
     afx_msg void OnWalsh();
     //}}AFX_MSG
     DECLARE_MESSAGE_MAP()
+public:
+    afx_msg void OnQuickforuierOrigin();
+    afx_msg void OnQuickforuierTransimpl1();
+    afx_msg void OnQuickforuierTransimpl2();
 };
 
 /////////////////////////////////////////////////////////////////////////////

@@ -44,12 +44,23 @@ CNumber ZhengJiaoBianHuanDib::Mul(const CNumber &c1, const CNumber &c2)
     return c;
 }
 
-///**************************************************************/           
-/*函数名称：FFT(const CNumber *t, const CNumber *f, int r)
-  参数:    t、f分别是指向时域和频域的指针，r是2的幂数                                   
-/*函数类型：void
-/*功能：此函数实现快速傅立叶变换         
-/****************************************************************/
+
+/*************************************************************************
+ *
+ * 函数名称：FFT(const CNumber *t, const CNumber *f, int r)
+ *
+ * 参数:
+ *   CNumber * t                - 指向时域值的指针
+ *   CNumber * f                - 指向频域值的指针
+ *   r                         －2的幂数
+ *
+ * 返回值:
+ *   无。
+ *
+ * 说明:
+ *   此函数实现一维快速傅立叶变换。
+ *
+ ************************************************************************/
 void ZhengJiaoBianHuanDib::FFT(const CNumber *t, CNumber *f, int r)
 {
     long count; // 傅立叶变换点数
@@ -112,72 +123,266 @@ void ZhengJiaoBianHuanDib::FFT(const CNumber *t, CNumber *f, int r)
 }
 
 ///////////////////////////////////////////////
-//此函数用来实现图象的傅立叶变换
-//两次调用快速傅立叶变换QFC()实现二维傅立叶变换
+//此函数用来实现图像的傅立叶变换（原始变换）
+//两次调用快速傅立叶变换FFT()实现二维傅立叶变换
 ///////////////////////////////////////////////
 void ZhengJiaoBianHuanDib::QuickFourier()
 {
-    LPBYTE  p_data, p;//指向原图象数据区指针
-    int width,height;//原图象的宽度和高度       
-    long w=1,h=1;//进行傅立叶变换的宽度和高度（2的整数次方）
-    int wp=0,hp=0;//迭代次数
-    int i,j;
-    double temp;//中间变量
-    CNumber *t,*f;
-    p_data=this->GetData();//指向原图象数据区
-    width=this->GetWidth();//得到图象宽度
-    height=this->GetHeight();//得到图象高度
-    long lLineBytes=WIDTHBYTES(width*8);//计算图象每行的字节数
-    while(w*2<=width)//计算进行傅立叶变换的宽度（2的整数次方）
+    LONG width = GetWidth();     // DIB的宽度
+    LONG height = GetHeight();   // DIB的高度
+    LONG dibWidth = WIDTHBYTES(width * 8);   // 取得原图的每行字节数（4字节对齐）
+
+    LPBYTE p_data = GetData(); // 指向DIB像素指针
+
+    LONG w = 1; // 进行傅立叶变换的宽度（2的整数次方）
+    LONG h = 1; // 进行傅立叶变换的高度（2的整数次方）
+
+    int wp = 0; // 宽方向迭代次数
+    int hp = 0; // 高方向迭代次数
+    
+    CNumber *t; // 时域数据
+    CNumber *f; // 频域数据
+
+    // 计算进行傅立叶变换的宽度（2的整数次方）
+    while (w * 2 <= width)
     {
-        w*=2;
+        w *= 2;
         wp++;
     }
-    while(h*2<=height)//计算进行傅立叶变换的高度（2的整数次方）
+    // 计算进行傅立叶变换的高度（2的整数次方）
+    while (h * 2 <= width)
     {
-        h*=2;
+        h *= 2;
         hp++;
     }
-    t=new CNumber[w*h];//分配存储器空间
-    f=new CNumber[w*h];
-    for(j=0;j<h;j++)
+
+    // 分配数据存储器空间
+    t = new CNumber[w * h];
+    f = new CNumber[w * h];
+
+    // 给时域赋值
+    for (int y = 0; y < h; y++)
     {
-        for(i=0;i<w;i++)
+        for (int x = 0; x < w; x++)
         {
-            p=p_data+lLineBytes*(height-j-1)+i;//指向第j行第i列象素
-            t[i+w*j].re=*(p);//给时域赋值
-            t[i+w*j].im=0;
+            t[x + w * y].re = p_data[dibWidth * (height - y - 1) + x];
+            t[x + w * y].im = 0;
         }
     }
-    for(j=0;j<h;j++)//在垂直方向上进行快速傅立叶变换
+    
+    // 在垂直方向上进行快速傅立叶变换
+    for (int y = 0; y < h; y++)
     {
-        FFT(&t[w*j],&f[w*j],wp);
+        this->FFT(&t[y * w], &f[y * w], wp);
     }
-    for(j=0;j<h;j++)//转换变换结果
+    
+    // 转换变换结果
+    for (int x = 0; x < w; x++)
     {
-        for(i=0;i<w;i++)
+        for (int y = 0; y < h; y++)
         {
-            t[j+h*i]=f[i+w*j];
+            t[y + h * x] = f[x + w * y]; // 将DIB按列排列
         }
     }
-    for(i=0;i<w;i++)//水平方向进行快速傅立叶变换
+
+    // 在水平方向上进行快速傅立叶变换
+    for (int x = 0; x < w; x++)
     {
-        FFT(&t[i*h],&f[i*h],hp);
+        this->FFT(&t[x * h], &f[x * h], hp);
     }
-    for(j=0;j<h;j++)
+    
+    // 傅里叶变换变换结果
+    for (int x = 0; x < w; x++)
     {
-        for(i=0;i<w;i++)
+        for (int y = 0; y < h; y++)
         {
-            temp=sqrt(f[i*h+j].re*f[i*h+j].re+f[i*h+j].im*f[i*h+j].im)/100;
-            if(temp>255)
+            int index = y + x * h;
+            int temp = sqrt(f[index].re * f[index].re + f[index].im * f[index].im) / 100; // 能量
+            if (temp > 255)
                 temp=255;
-            p=p_data+lLineBytes*(height-(j<h/2?j+h/2:j-h/2)-1)+
-                (i<w/2?i+w/2:i-w/2);//将变换后的原点移到中心
-            *(p)=(BYTE)(temp);
+            p_data[dibWidth * (height - y - 1) + x] = (BYTE)(temp); 
         }
     }
-    delete t;
-    delete f;
+
+    delete [] t;
+    delete [] f;
+}
+
+///////////////////////////////////////////////
+//二维傅立叶变换原点平移（实现一：时域 * 平移因子）
+///////////////////////////////////////////////
+void ZhengJiaoBianHuanDib::QuickFourier1()
+{
+    LONG width = GetWidth();     // DIB的宽度
+    LONG height = GetHeight();   // DIB的高度
+    LONG dibWidth = WIDTHBYTES(width * 8);   // 取得原图的每行字节数（4字节对齐）
+
+    LPBYTE p_data = GetData(); // 指向DIB像素指针
+
+    LONG w = 1; // 进行傅立叶变换的宽度（2的整数次方）
+    LONG h = 1; // 进行傅立叶变换的高度（2的整数次方）
+
+    int wp = 0; // 宽方向迭代次数
+    int hp = 0; // 高方向迭代次数
+
+    CNumber *t; // 时域数据
+    CNumber *f; // 频域数据
+
+    // 计算进行傅立叶变换的宽度（2的整数次方）
+    while (w * 2 <= width)
+    {
+        w *= 2;
+        wp++;
+    }
+    // 计算进行傅立叶变换的高度（2的整数次方）
+    while (h * 2 <= width)
+    {
+        h *= 2;
+        hp++;
+    }
+
+    // 分配数据存储器空间
+    t = new CNumber[w * h];
+    f = new CNumber[w * h];
+
+    // 给时域赋值
+    for (int y = 0; y < h; y++)
+    {
+        for (int x = 0; x < w; x++)
+        {
+            /////////////////////////////////
+            int deltaXY = (x + y) % 2 ? -1 : 1; // (-1)^(x + y) 平移因子
+            /////////////////////////////////
+            t[x + w * y].re = p_data[dibWidth * (height - y - 1) + x] * deltaXY;
+            t[x + w * y].im = 0;
+        }
+    }
+
+    // 在垂直方向上进行快速傅立叶变换
+    for (int y = 0; y < h; y++)
+    {
+        this->FFT(&t[y * w], &f[y * w], wp);
+    }
+
+    // 转换变换结果
+    for (int x = 0; x < w; x++)
+    {
+        for (int y = 0; y < h; y++)
+        {
+            t[y + h * x] = f[x + w * y]; // 将DIB按列排列
+        }
+    }
+
+    // 在水平方向上进行快速傅立叶变换
+    for (int x = 0; x < w; x++)
+    {
+        this->FFT(&t[x * h], &f[x * h], hp);
+    }
+
+    // 傅里叶变换变换结果
+    for (int x = 0; x < w; x++)
+    {
+        for (int y = 0; y < h; y++)
+        {
+            int index = y + x * h;
+            int temp = sqrt(f[index].re * f[index].re + f[index].im * f[index].im) / 100; // 能量
+            if (temp > 255)
+                temp=255;
+            p_data[dibWidth * (height - y - 1) + x] = (BYTE)(temp); 
+        }
+    }
+
+    delete [] t;
+    delete [] f;
+}
+
+///////////////////////////////////////////////
+//二维傅立叶变换原点平移（实现二：对原始变换直接转换）
+///////////////////////////////////////////////
+void ZhengJiaoBianHuanDib::QuickFourier2()
+{
+    LONG width = GetWidth();     // DIB的宽度
+    LONG height = GetHeight();   // DIB的高度
+    LONG dibWidth = WIDTHBYTES(width * 8);   // 取得原图的每行字节数（4字节对齐）
+
+    LPBYTE p_data = GetData(); // 指向DIB像素指针
+
+    LONG w = 1; // 进行傅立叶变换的宽度（2的整数次方）
+    LONG h = 1; // 进行傅立叶变换的高度（2的整数次方）
+
+    int wp = 0; // 宽方向迭代次数
+    int hp = 0; // 高方向迭代次数
+
+    CNumber *t; // 时域数据
+    CNumber *f; // 频域数据
+
+    // 计算进行傅立叶变换的宽度（2的整数次方）
+    while (w * 2 <= width)
+    {
+        w *= 2;
+        wp++;
+    }
+    // 计算进行傅立叶变换的高度（2的整数次方）
+    while (h * 2 <= width)
+    {
+        h *= 2;
+        hp++;
+    }
+
+    // 分配数据存储器空间
+    t = new CNumber[w * h];
+    f = new CNumber[w * h];
+
+    // 给时域赋值
+    for (int y = 0; y < h; y++)
+    {
+        for (int x = 0; x < w; x++)
+        {
+            t[x + w * y].re = p_data[dibWidth * (height - y - 1) + x];
+            t[x + w * y].im = 0;
+        }
+    }
+
+    // 在垂直方向上进行快速傅立叶变换
+    for (int y = 0; y < h; y++)
+    {
+        this->FFT(&t[y * w], &f[y * w], wp);
+    }
+
+    // 转换变换结果
+    for (int x = 0; x < w; x++)
+    {
+        for (int y = 0; y < h; y++)
+        {
+            t[y + h * x] = f[x + w * y]; // 将DIB按列排列
+        }
+    }
+
+    // 在水平方向上进行快速傅立叶变换
+    for (int x = 0; x < w; x++)
+    {
+        this->FFT(&t[x * h], &f[x * h], hp);
+    }
+
+    ///////////////////////////////////////////////////////////
+    // 将傅里叶变换后的原点移动到中心 (0, 0) -> (w/2, h/2)
+    for (int x = 0; x < w; x++)
+    {
+        for (int y = 0; y < h; y++)
+        {
+            int index = y + x * h;
+            int temp = sqrt(f[index].re * f[index].re + f[index].im * f[index].im) / 100; // 能量
+            if (temp > 255)
+                temp=255;
+            int W = (x < w / 2) ?  (x + w / 2) : (x - w / 2);
+            int H = (y < h / 2) ?  (y + h / 2) : (y - h / 2);
+            p_data[dibWidth * (height - H - 1) + W] = (BYTE)(temp); // 水平垂直镜像
+        }
+    }
+    ///////////////////////////////////////////////////////////
+
+    delete [] t;
+    delete [] f;
 }
 
 
