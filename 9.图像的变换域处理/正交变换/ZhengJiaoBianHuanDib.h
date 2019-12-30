@@ -26,7 +26,7 @@ private:
     CNumber Sub(const CNumber &c1, const CNumber &c2);//实现复数的减法运算
     CNumber Mul(const CNumber &c1, const CNumber &c2);//实现复数的乘法运算
     void FFT(const CNumber *t, CNumber *f, int power); //此函数实现一维快速傅立叶变换
-    void LiSan(double *t, double *f, int r);//此函数实现离散余弦变换
+    void FCT(const double *t, double *f, int r);//此函数实现一维快速离散余弦变换
     void WALSH(double *t, double *f, int r);//该函数用来实现快速沃尔什-哈达玛变换。
 };
 #endif

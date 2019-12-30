@@ -388,7 +388,7 @@ void ZhengJiaoBianHuanDib::QuickFourier2()
 
 /*************************************************************************
  *
- * 函数名称：LiSan(double *t, double *f, int r)
+ * 函数名称：FCT(const double *t, double *f, int r)
  *
  * 参数:
  *   double * t                - 指向时域值的指针
@@ -403,7 +403,7 @@ void ZhengJiaoBianHuanDib::QuickFourier2()
  * 来实现离散余弦变换。
  *
  ************************************************************************/
-void ZhengJiaoBianHuanDib::LiSan(double *t, double *f, int r)
+void ZhengJiaoBianHuanDib::FCT(const double *t, double *f, int r)
 {
     // 离散余弦变换点数
     long    count;    
@@ -580,7 +580,7 @@ bool ZhengJiaoBianHuanDib::DIBLiSanYuXuan(LPBYTE lpDIBBits, LONG lWidth, LONG lH
     for(j = 0; j < h; j++)
     {
         // 对y方向进行离散余弦变换
-        LiSan(&f[w * j], &F[w * j], wp);
+        FCT(&f[w * j], &F[w * j], wp);
     }
     // 保存计算结果
     for(j = 0; j < h; j++)
@@ -593,7 +593,7 @@ bool ZhengJiaoBianHuanDib::DIBLiSanYuXuan(LPBYTE lpDIBBits, LONG lWidth, LONG lH
     for(i = 0; i < w; i++)
     {
         // 对x方向进行离散余弦变换
-        LiSan(&f[i * h], &F[i * h], hp);
+        FCT(&f[i * h], &F[i * h], hp);
     }
     // 行
     for(j = 0; j < h; j++)

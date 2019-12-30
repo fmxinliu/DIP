@@ -220,8 +220,6 @@ void CDynSplitView2::OnLisanyuxuan() //对图像进行离散余弦变换
 {
     // TODO: Add your command handler code here
     clearmem();
-        
-    // 图像离散余弦变换
     
     // 指向DIB象素指针
     LPBYTE    lpDIBBits;
@@ -231,15 +229,14 @@ void CDynSplitView2::OnLisanyuxuan() //对图像进行离散余弦变换
     if(CDibNew1->byBitCount==24) //24位真彩色
     {
         clearmem2();
-    lpDIBBits = CDibNew1->GetData2();
+        lpDIBBits = CDibNew1->GetData2();
     }
     long width=CDibNew1->GetWidth();
     long height=CDibNew1->GetHeight();
     
-    // 调用DIBDct()函数进行离散余弦变换
+    // 离散余弦变换
     if (CDibNew1->DIBLiSanYuXuan(lpDIBBits, width, height))
     {
-        // 更新视图
         Invalidate();
     }
 }
