@@ -246,25 +246,22 @@ void CDynSplitView2::OnWalsh() //对图像进行沃尔什变换
     // TODO: Add your command handler code here
     clearmem();
         
-    // 图像离散余弦变换
-    
     // 指向DIB象素指针
     LPBYTE    lpDIBBits;
     lpDIBBits = CDibNew1->GetData();
     
     // 找到DIB图像象素起始位置
     if(CDibNew1->byBitCount==24) //24位真彩色
-    {     clearmem2();
-
-    lpDIBBits = CDibNew1->GetData2();
+    {
+        clearmem2();
+        lpDIBBits = CDibNew1->GetData2();
     }
     long width=CDibNew1->GetWidth();
     long height=CDibNew1->GetHeight();
     
-    // 调用DIBDct()函数进行离散余弦变换
+    // 沃尔什变换
     if (CDibNew1->DIBWalsh(lpDIBBits, width, height))
     {
-        // 更新视图
         Invalidate();
     }
 }

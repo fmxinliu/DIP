@@ -399,7 +399,7 @@ void ZhengJiaoBianHuanDib::QuickFourier2()
  *   无。
  *
  * 说明:
- *   该函数用来实现快速离散余弦变换。该函数利用2N点的快速付立叶变换
+ *   该函数用来实现快速离散余弦变换。该函数利用2N点的快速傅里叶变换
  * 来实现离散余弦变换。
  *
  ************************************************************************/
@@ -424,7 +424,7 @@ void ZhengJiaoBianHuanDib::FCT(const double *t, double *f, int r)
         X[i].re=t[i];
         X[i].im=0;
     }
-    // 调用快速付立叶变换
+    // 调用快速傅里叶变换
     FFT(X,X,r+1);
     // 调整系数
     dTemp = 1/sqrt((double)count);
@@ -443,7 +443,7 @@ void ZhengJiaoBianHuanDib::FCT(const double *t, double *f, int r)
 /*************************************************************************
  *
  * 函数名称：
- *   WALSH()
+ *   FWT(const double *t, double *f, int r)
  *
  * 参数:
  *   double * t                - 指向时域值的指针
@@ -458,7 +458,7 @@ void ZhengJiaoBianHuanDib::FCT(const double *t, double *f, int r)
  *
  ************************************************************************/
 
-void ZhengJiaoBianHuanDib::WALSH(double *t, double *f, int r)
+void ZhengJiaoBianHuanDib::FWT(const double *t, double *f, int r)
 {
     // 沃尔什-哈达玛变换点数
     long   count;    
@@ -534,7 +534,7 @@ bool ZhengJiaoBianHuanDib::DIBLiSanYuXuan(LPBYTE lpDIBBits, LONG lWidth, LONG lH
     // 循环变量
     LONG    i;
     LONG    j;
-    // 进行付立叶变换的宽度和高度（2的整数次方）
+    // 进行傅里叶变换的宽度和高度（2的整数次方）
     LONG    w;
     LONG    h;
     // 中间变量
@@ -650,7 +650,7 @@ bool ZhengJiaoBianHuanDib::DIBWalsh(LPBYTE lpDIBBits, LONG lWidth, LONG lHeight)
     // 循环变量
     LONG    i;
     LONG    j;
-    // 进行付立叶变换的宽度和高度（2的整数次方）
+    // 进行傅里叶变换的宽度和高度（2的整数次方）
     LONG    w;
     LONG    h;
     // 中间变量
@@ -693,7 +693,7 @@ bool ZhengJiaoBianHuanDib::DIBWalsh(LPBYTE lpDIBBits, LONG lWidth, LONG lHeight)
         }
     }    
     // 调用快速沃尔什－哈达玛变换
-    WALSH(f, F, wp + hp);
+    FWT(f, F, wp + hp);
     // 列
     for(j = 0; j < w; j++)
     {
