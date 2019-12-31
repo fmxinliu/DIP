@@ -132,7 +132,7 @@ void ZhengJiaoBianHuanDib::QuickFourier()
     LONG height = GetHeight();   // DIB的高度
     LONG dibWidth = WIDTHBYTES(width * 8);   // 取得原图的每行字节数（4字节对齐）
 
-    LPBYTE p_data = GetData(); // 指向DIB像素指针
+    LPBYTE p_data = (byBitCount == 8) ? GetData() : GetData2(); // 指向DIB像素指针
 
     LONG w = 1; // 进行傅立叶变换的宽度（2的整数次方）
     LONG h = 1; // 进行傅立叶变换的高度（2的整数次方）
@@ -217,7 +217,7 @@ void ZhengJiaoBianHuanDib::QuickFourier1()
     LONG height = GetHeight();   // DIB的高度
     LONG dibWidth = WIDTHBYTES(width * 8);   // 取得原图的每行字节数（4字节对齐）
 
-    LPBYTE p_data = GetData(); // 指向DIB像素指针
+    LPBYTE p_data = (byBitCount == 8) ? GetData() : GetData2(); // 指向DIB像素指针
 
     LONG w = 1; // 进行傅立叶变换的宽度（2的整数次方）
     LONG h = 1; // 进行傅立叶变换的高度（2的整数次方）
@@ -305,7 +305,7 @@ void ZhengJiaoBianHuanDib::QuickFourier2()
     LONG height = GetHeight();   // DIB的高度
     LONG dibWidth = WIDTHBYTES(width * 8);   // 取得原图的每行字节数（4字节对齐）
 
-    LPBYTE p_data = GetData(); // 指向DIB像素指针
+    LPBYTE p_data = (byBitCount == 8) ? GetData() : GetData2(); // 指向DIB像素指针
 
     LONG w = 1; // 进行傅立叶变换的宽度（2的整数次方）
     LONG h = 1; // 进行傅立叶变换的高度（2的整数次方）
