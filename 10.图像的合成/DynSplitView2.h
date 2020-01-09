@@ -12,6 +12,8 @@
 #include "TuXiangHeChengDib.h"
 #include "CDIB.h"
 
+typedef void (*PF)(LPBYTE p_data, LPBYTE p_dataBK, int width, int height);
+
 class CDynSplitView2 : public CView
 {
 protected:
@@ -24,8 +26,8 @@ public:
 
 // Operations
 public:
-        CPalette *CreateBitmapPalette( TuXiangHeChengDib* pBitmap);
-         CString filename;
+        CPalette *CreateBitmapPalette(TuXiangHeChengDib* pBitmap);
+        CString filename;
         TuXiangHeChengDib *CDibNew1;
         CDib *CDib1,*CDib2;
         CPalette hPalette;

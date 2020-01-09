@@ -1,7 +1,7 @@
 #ifndef __TuXiangHeChengDib_H
 #define __TuXiangHeChengDib_H
 #include "Cdib.h"
-class TuXiangHeChengDib :public CDib
+class TuXiangHeChengDib : public CDib
 {
 public:
      CBitmap m_bitmap;

@@ -164,11 +164,11 @@ void TuXiangHeChengDib::Sub(LPBYTE p_data, LPBYTE p_dataBK, int width, int heigh
 
 
 ///***************************************************************/           
-/*函数名称：Yuyunsuan(LPBYTE p_data, LPBYTE p_dataBK,int width,int height)                                        
+/*函数名称：Yuyunsuan(LPBYTE p_data, LPBYTE p_dataBK, int width, int height)                                        
 /*函数类型：void 
 /*参数说明：p_data       原图像首地址
-/*          p_dataBK     背景图像首地址
-/*          width，height 原图像的高和宽                                   
+/*         p_dataBK     背景图像首地址
+/*         width，height 原图像的高和宽                                   
 /*功能：对图像进行与运算。            
 /***************************************************************/
 void TuXiangHeChengDib::Yuyunsuan(LPBYTE p_data, LPBYTE p_dataBK, int width, int height)
@@ -203,7 +203,7 @@ void TuXiangHeChengDib::Yuyunsuan(LPBYTE p_data, LPBYTE p_dataBK, int width, int
         {
             for(i=1;i<width-1;i++)
             {   
-                if( temp2[width*j+i]==1&& temp1[width*j+i]==1)
+                if( temp2[width*j+i]==1 && temp1[width*j+i]==1)
                     temp1[width*j+i]=255;
                 else 
                     temp1[width*j+i]=0;
@@ -247,7 +247,7 @@ void TuXiangHeChengDib::Yuyunsuan(LPBYTE p_data, LPBYTE p_dataBK, int width, int
         {
             for(i=1;i<DibWidth-1;i++)
             {   
-                if( p_temp2[DibWidth*j+i]==1&& p_temp1[DibWidth*j+i]==1)
+                if( p_temp2[DibWidth*j+i]==1 && p_temp1[DibWidth*j+i]==1)
                     p_temp1[DibWidth*j+i]=255;
                 else 
                     p_temp1[DibWidth*j+i]=0;
@@ -262,8 +262,8 @@ void TuXiangHeChengDib::Yuyunsuan(LPBYTE p_data, LPBYTE p_dataBK, int width, int
 /*函数名称：Huoyunsuan(LPBYTE p_data, LPBYTE p_dataBK,int width,int height)                                        
 /*函数类型：void 
 /*参数说明：p_data       原图像首地址
-/*          p_dataBK     背景图像首地址
-/*          width，height 原图像的高和宽                                   
+/*         p_dataBK     背景图像首地址
+/*         width，height 原图像的高和宽                                   
 /*功能：对图像进行或运算。            
 /***************************************************************/ 
 void TuXiangHeChengDib::Huoyunsuan(LPBYTE p_data, LPBYTE p_dataBK, int width, int height)
@@ -293,12 +293,12 @@ void TuXiangHeChengDib::Huoyunsuan(LPBYTE p_data, LPBYTE p_dataBK, int width, in
                     temp2[width*j+i]=1; 
             }
         }
-        //进行每个像素的与运算
+        //进行每个像素的或运算
         for(j=1;j<height-1;j++)
         {
             for(i=1;i<width-1;i++)
             {   
-                if( temp2[width*j+i]==0&& temp1[width*j+i]==0)
+                if( temp2[width*j+i]==0 && temp1[width*j+i]==0)
                     temp1[width*j+i]=0;
                 else 
                     temp1[width*j+i]=255;
@@ -337,12 +337,12 @@ void TuXiangHeChengDib::Huoyunsuan(LPBYTE p_data, LPBYTE p_dataBK, int width, in
                     p_temp2[DibWidth*j+i]=1; 
             }
         }
-        //进行每个像素的与运算
+        //进行每个像素的或运算
         for(j=1;j<height-1;j++)
         {
             for(i=1;i<DibWidth-1;i++)
             {   
-                if( p_temp2[DibWidth*j+i]==0&& p_temp1[DibWidth*j+i]==0)
+                if( p_temp2[DibWidth*j+i]==0 && p_temp1[DibWidth*j+i]==0)
                     p_temp1[DibWidth*j+i]=0;
                 else 
                     p_temp1[DibWidth*j+i]=255;
@@ -379,19 +379,19 @@ void TuXiangHeChengDib::Feiyunsuan()
     {
         for(i=0;i<width;i++)
         {
-                if(p_data[width*j+i]>128)
+            if(p_data[width*j+i]>128)
                 p_temp1[width*j+i]=1; 
         }
     }
  
-    //进行每个像素的与运算
+    //进行每个像素的非运算
     for(j=1;j<height-1;j++)
     {
         for(i=1;i<width-1;i++)
         {   
-                if(p_temp1[width*j+i]==0 )
+            if(p_temp1[width*j+i]==0)
                  p_temp1[width*j+i]=255;
-                else 
+            else 
                  p_temp1[width*j+i]=0;
         }
     }
@@ -402,11 +402,11 @@ void TuXiangHeChengDib::Feiyunsuan()
 
 
 ///***************************************************************/           
-/*函数名称：Huofei(LPBYTE p_data, LPBYTE p_dataBK,int width,int height)                                        
+/*函数名称：Huofei(LPBYTE p_data, LPBYTE p_dataBK, int width, int height)                                        
 /*函数类型：void 
 /*参数说明：p_data       原图像首地址
-/*          p_dataBK     背景图像首地址
-/*          width，height 原图像的高和宽                                   
+/*         p_dataBK     背景图像首地址
+/*         width，height 原图像的高和宽                                   
 /*功能：对图像进行或非运算。            
 /***************************************************************/ 
 void TuXiangHeChengDib::Huofei(LPBYTE p_data, LPBYTE p_dataBK, int width, int height)
@@ -436,12 +436,12 @@ void TuXiangHeChengDib::Huofei(LPBYTE p_data, LPBYTE p_dataBK, int width, int he
                     temp2[width*j+i]=1; 
             }
         }
-        //进行每个像素的与运算
+        //进行每个像素的或非运算
         for(j=1;j<height-1;j++)
         {
             for(i=1;i<width-1;i++)
             {   
-                if( temp2[width*j+i]==0&& temp1[width*j+i]==0)
+                if( temp2[width*j+i]==0 && temp1[width*j+i]==0)
                     temp1[width*j+i]=255;
                 else 
                     temp1[width*j+i]=0;
@@ -480,12 +480,12 @@ void TuXiangHeChengDib::Huofei(LPBYTE p_data, LPBYTE p_dataBK, int width, int he
                     p_temp2[DibWidth*j+i]=1; 
             }
         }
-        //进行每个像素的与运算
+        //进行每个像素的或非运算
         for(j=1;j<height-1;j++)
         {
             for(i=3;i<DibWidth-3;i++)
             {   
-                if( p_temp2[DibWidth*j+i]==0&& p_temp1[DibWidth*j+i]==0)
+                if( p_temp2[DibWidth*j+i]==0 && p_temp1[DibWidth*j+i]==0)
                     p_temp1[DibWidth*j+i]=255;
                 else 
                     p_temp1[DibWidth*j+i]=0;
@@ -500,11 +500,11 @@ void TuXiangHeChengDib::Huofei(LPBYTE p_data, LPBYTE p_dataBK, int width, int he
 
 
 ///***************************************************************/           
-/*函数名称：Yufei(LPBYTE p_data, LPBYTE p_dataBK,int width,int height)                                        
+/*函数名称：Yufei(LPBYTE p_data, LPBYTE p_dataBK, int width, int height)                                        
 /*函数类型：void 
 /*参数说明：p_data       原图像首地址
-/*          p_dataBK     背景图像首地址
-/*          width，height 原图像的高和宽                                   
+/*         p_dataBK     背景图像首地址
+/*         width，height 原图像的高和宽                                   
 /*功能：对图像进行与非运算。            
 /***************************************************************/
 void TuXiangHeChengDib::Yufei(LPBYTE p_data, LPBYTE p_dataBK, int width, int height)
@@ -539,7 +539,7 @@ void TuXiangHeChengDib::Yufei(LPBYTE p_data, LPBYTE p_dataBK, int width, int hei
         {
             for(i=1;i<width-1;i++)
             {   
-                if( temp2[width*j+i]==1&& temp1[width*j+i]==1)
+                if( temp2[width*j+i]==1 && temp1[width*j+i]==1)
                     temp1[width*j+i]=0;
                 else 
                     temp1[width*j+i]=255;
@@ -597,11 +597,11 @@ void TuXiangHeChengDib::Yufei(LPBYTE p_data, LPBYTE p_dataBK, int width, int hei
 
 
 ///***************************************************************/           
-/*函数名称：Yihuo(LPBYTE p_data, LPBYTE p_dataBK,int width,int height)                                        
+/*函数名称：Yihuo(LPBYTE p_data, LPBYTE p_dataBK, int width, int height)                                        
 /*函数类型：void 
 /*参数说明：p_data       原图像首地址
-/*          p_dataBK     背景图像首地址
-/*          width，height 原图像的高和宽                                   
+/*         p_dataBK     背景图像首地址
+/*         width，height 原图像的高和宽                                   
 /*功能：对图像进行异或运算。            
 /***************************************************************/
 void TuXiangHeChengDib::Yihuo(LPBYTE p_data, LPBYTE p_dataBK, int width, int height)
@@ -636,10 +636,10 @@ void TuXiangHeChengDib::Yihuo(LPBYTE p_data, LPBYTE p_dataBK, int width, int hei
         {
             for(i=1;i<width-1;i++)
             {   
-                if( temp2[width*j+i]+ temp1[width*j+i]==1)
-                  temp1[width*j+i]=255;
+                if( temp2[width*j+i] + temp1[width*j+i]==1)
+                    temp1[width*j+i]=255;
                 else 
-                      temp1[width*j+i]=0;
+                    temp1[width*j+i]=0;
             }
         }
         memcpy(p_data, temp1,width*height);   //复制处理后的图像
@@ -667,7 +667,7 @@ void TuXiangHeChengDib::Yihuo(LPBYTE p_data, LPBYTE p_dataBK, int width, int hei
             }
         }
         //对背景二值化
-            for(j=0;j<height;j++)
+        for(j=0;j<height;j++)
         {
             for(i=0;i<DibWidth;i++)
             {

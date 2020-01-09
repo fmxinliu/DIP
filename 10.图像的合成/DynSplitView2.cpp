@@ -184,80 +184,14 @@ void CDynSplitView2::OnSub()
 /*与运算消息映射*/
 void CDynSplitView2::OnYuyunsuan() 
 {
-    // TODO: Add your command handler code here
-    clearmem();
-    // 指向DIB象素指针
-    LPBYTE   p_data,p_dataBK;
-
-    //图像的宽度与高度
-    int width,height;
-    //获得原图
-    CDSplitDoc* pDoc = GetDocument();
-    ASSERT_VALID(pDoc);
-    CDibNew1=&pDoc->CDibNew;
-
- 
-    // 找到DIB图像象素起始位置
-    p_data = CDibNew1->GetData();
-    
-    width = CDibNew1->GetWidth();
-    height = CDibNew1->GetHeight();
-     
-    AfxMessageBox("选择背景图");
-    
-    //获得模版
-    CFileDialog dlg(TRUE,"bmp","*.bmp");
-    if(dlg.DoModal() == IDOK)
-       filename.Format ("%s",dlg.GetPathName() ); 
-    CDSplitDoc* pDoc2 = GetDocument();
-    ASSERT_VALID(pDoc2);
-        CDib2=&pDoc2->CDib;
-       CDib2->LoadFile(filename);
-       // 找到DIB模版图像象素起始位置
-    p_dataBK = CDib2->GetData();   
-    // 调用与运算函数进行与运算
-    CDibNew1->Yuyunsuan(p_data,p_dataBK, width,height) ;                         
-     Invalidate();
+    handleDib(&TuXiangHeChengDib::Yuyunsuan);
 }
 
 
 /*或运算消息映射*/
 void CDynSplitView2::OnHuoyunsuan() 
 {
-    // TODO: Add your command handler code here
-        clearmem();
-        // 指向DIB象素指针
-    LPBYTE   p_data,p_dataBK;
-    
-    //图像的宽度与高度
-    int width,height;
-    //获得原图
-     CDSplitDoc* pDoc = GetDocument();
-    ASSERT_VALID(pDoc);
-    CDibNew1=&pDoc->CDibNew;
-
- 
-    // 找到DIB图像象素起始位置
-    p_data = CDibNew1->GetData();
-    
-    width = CDibNew1->GetWidth();
-    height = CDibNew1->GetHeight();
-     
-    AfxMessageBox("选择背景图");
-    
-    //获得模版
-    CFileDialog dlg(TRUE,"bmp","*.bmp");
-    if(dlg.DoModal() == IDOK)
-       filename.Format ("%s",dlg.GetPathName() ); 
-    CDSplitDoc* pDoc2 = GetDocument();
-    ASSERT_VALID(pDoc2);
-        CDib2=&pDoc2->CDib;
-       CDib2->LoadFile(filename);
-       // 找到DIB模版图像象素起始位置
-    p_dataBK = CDib2->GetData();   
-    // 调用或运算函数进行或运算
-    CDibNew1->Huoyunsuan(p_data,p_dataBK, width,height) ;                         
-     Invalidate();
+    handleDib(&TuXiangHeChengDib::Huoyunsuan);
 }
 
 
@@ -274,120 +208,21 @@ void CDynSplitView2::OnFeiyunsuan()
 /*或非运算消息映射*/
 void CDynSplitView2::OnHuofei() 
 {
-    // TODO: Add your command handler code here
-            clearmem();
-        // 指向DIB象素指针
-    LPBYTE   p_data,p_dataBK;
-    
-    //图像的宽度与高度
-    int width,height;
-    //获得原图
-     CDSplitDoc* pDoc = GetDocument();
-    ASSERT_VALID(pDoc);
-    CDibNew1=&pDoc->CDibNew;
-
- 
-    // 找到DIB图像象素起始位置
-    p_data = CDibNew1->GetData();
-    
-    width = CDibNew1->GetWidth();
-    height = CDibNew1->GetHeight();
-     
-    AfxMessageBox("选择背景图");
-    
-    //获得模版
-    CFileDialog dlg(TRUE,"bmp","*.bmp");
-    if(dlg.DoModal() == IDOK)
-       filename.Format ("%s",dlg.GetPathName() ); 
-    CDSplitDoc* pDoc2 = GetDocument();
-    ASSERT_VALID(pDoc2);
-        CDib2=&pDoc2->CDib;
-       CDib2->LoadFile(filename);
-       // 找到DIB模版图像象素起始位置
-    p_dataBK = CDib2->GetData();   
-    // 调用或非运算函数进行或非运算
-    CDibNew1->Huofei(p_data,p_dataBK, width,height) ;                         
-     Invalidate();
+    handleDib(&TuXiangHeChengDib::Huofei);
 }
 
 
 /*与非运算消息映射*/
 void CDynSplitView2::OnYufei() 
 {
-    // TODO: Add your command handler code here
-            clearmem();
-        // 指向DIB象素指针
-    LPBYTE   p_data,p_dataBK;
-    
-    //图像的宽度与高度
-    int width,height;
-    //获得原图
-     CDSplitDoc* pDoc = GetDocument();
-    ASSERT_VALID(pDoc);
-    CDibNew1=&pDoc->CDibNew;
-
- 
-    // 找到DIB图像象素起始位置
-    p_data = CDibNew1->GetData();
-    
-    width = CDibNew1->GetWidth();
-    height = CDibNew1->GetHeight();
-     
-    AfxMessageBox("选择背景图");
-    
-    //获得模版
-    CFileDialog dlg(TRUE,"bmp","*.bmp");
-    if(dlg.DoModal() == IDOK)
-       filename.Format ("%s",dlg.GetPathName() ); 
-    CDSplitDoc* pDoc2 = GetDocument();
-    ASSERT_VALID(pDoc2);
-        CDib2=&pDoc2->CDib;
-       CDib2->LoadFile(filename);
-       // 找到DIB模版图像象素起始位置
-    p_dataBK = CDib2->GetData();   
-    // 调用与非运算函数进行与非运算
-    CDibNew1->Yufei(p_data,p_dataBK, width,height) ;                         
-     Invalidate();
+    handleDib(&TuXiangHeChengDib::Yufei);
 }
 
 
 /*与或运算消息映射*/
 void CDynSplitView2::OnYihuo() 
 {
-    // TODO: Add your command handler code here
-    clearmem();
-        // 指向DIB象素指针
-    LPBYTE  p_data,p_dataBK;
-    
-    //图像的宽度与高度
-    int width,height;
-    //获得原图
-     CDSplitDoc* pDoc = GetDocument();
-    ASSERT_VALID(pDoc);
-    CDibNew1=&pDoc->CDibNew;
-
- 
-    // 找到DIB图像象素起始位置
-    p_data = CDibNew1->GetData();
-    
-    width = CDibNew1->GetWidth();
-    height = CDibNew1->GetHeight();
-     
-    AfxMessageBox("选择背景图");
-    
-    //获得模版
-    CFileDialog dlg(TRUE,"bmp","*.bmp");
-    if(dlg.DoModal() == IDOK)
-       filename.Format ("%s",dlg.GetPathName() ); 
-    CDSplitDoc* pDoc2 = GetDocument();
-    ASSERT_VALID(pDoc2);
-        CDib2=&pDoc2->CDib;
-       CDib2->LoadFile(filename);
-       // 找到DIB模版图像象素起始位置
-    p_dataBK = CDib2->GetData();   
-    // 调用异或运算函数进行异或运算
-    CDibNew1->Yihuo(p_data,p_dataBK, width,height) ;                         
-     Invalidate();
+    handleDib(&TuXiangHeChengDib::Yihuo);
 }
 
 void CDynSplitView2::handleDib(void (TuXiangHeChengDib::*pf)(LPBYTE p_data, LPBYTE p_dataBK, int width, int height))
