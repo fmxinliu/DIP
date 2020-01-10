@@ -7,7 +7,11 @@
 #include "MakeColorDib.h"
 #include "MainFrm.h"
 #include "math.h"
-#define BOUND(x,a,b) (((x) < (a)) ? (a) : (((x) > (b)) ? (b) : (x)))
+
+#define MIN(x, a, b)    min(min((x), (a)), min((x), (b)))
+#define MAX(x, a, b)    max(max((x), (a)), max((x), (b)))
+#define BOUND(x, a, b)  (((x) < (a)) ? (a) : (((x) > (b)) ? (b) : (x)))
+
 #ifdef _DEBUG
 #undef THIS_FILE
 static char THIS_FILE[]=__FILE__;
@@ -29,39 +33,35 @@ MakeColorDib::~MakeColorDib()
 }
 
 /***************************************************************/
-/*函数名称：MakegGray()                                        */
+/*函数名称：MakeGray()                                        */
 /*函数类型：void                                               */
 /*功能：真彩色转化成256色灰度图像。                            */
 /***************************************************************/
-void MakeColorDib::MakegGray()    //灰度变化
+void MakeColorDib::MakeGray()    //灰度变化
 {
-    BYTE *p_data;     //原图数据区指针
-    int wide,height,DibWidth;    //原图长、宽、字节宽
-    p_data=this->GetData ();   //取得原图的数据区指针
-    wide=this->GetWidth ();   //取得原图的数据区宽度
-    height=this->GetHeight ();   //取得原图的数据区高度
-    DibWidth=this->GetDibWidthBytes();   //取得原图的每行字节数
-    for(int j=0;j<height;j++)    // 每行
-        for(int i=0;i<DibWidth;i+=3)    // 每列
+    ASSERT(this->m_pBitmapInfoHeader->biBitCount == 24);
+
+    BYTE *p_data = this->GetData();  //取得原图的数据区指针
+    int width = this->GetWidth();    //取得原图的数据区宽度
+    int height = this->GetHeight();  //取得原图的数据区高度
+    int dibWidth = this->GetDibWidthBytes(); //取得原图的每行字节数
+
+    for (int y = 0; y < height; y++) 
+    {
+        for (int x = 0; x < dibWidth; x += 3)
         {
-            BYTE* pbyBlue = p_data++;   //得到蓝色值
-            BYTE* pbyGreen = p_data++;  //得到绿色值
-            BYTE* pbyRed = p_data++;    //得到红色值
-            BYTE r = *pbyRed;
-            BYTE g = *pbyGreen;
-            BYTE b = *pbyBlue;
+            BYTE *pbyBlue = p_data++;   //得到蓝色值
+            BYTE *pbyGreen = p_data++;  //得到绿色值
+            BYTE *pbyRed = p_data++;    //得到红色值
+
             //取到原r,g,b中的最大值作为像素三分量值的新值
-            int gray=0;
-            if(r>g)
-                gray=r;
-            else 
-                gray=g;
-            if(gray<b)
-                gray=b;            
-               *pbyBlue = gray;     //将取到的最大值赋给像素的蓝分量
+            int gray = MAX(*pbyRed, *pbyGreen, *pbyBlue);
+
+            *pbyBlue = gray;     //将取到的最大值赋给像素的蓝分量
             *pbyGreen = gray;    //将取到的最大值赋给像素的绿分量
             *pbyRed = gray;         //将取到的最大值赋给像素的红分量
         }
+    }
 }
 
 /***************************************************************/

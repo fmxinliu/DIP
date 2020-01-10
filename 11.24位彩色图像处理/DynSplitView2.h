@@ -53,7 +53,7 @@ protected:
     //{{AFX_MSG(CDynSplitView2)
     afx_msg BOOL OnEraseBkgnd(CDC* pDC);
     afx_msg void OnFilesave();
-    afx_msg void OnMakegGray();
+    afx_msg void OnMakeGray();
     afx_msg void OnLightAlter();
     afx_msg void OnLightReverse();
     afx_msg void OnContrastAlter();

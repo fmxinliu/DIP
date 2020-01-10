@@ -83,7 +83,7 @@ BEGIN_MESSAGE_MAP(CDynSplitView2, CView)
     //{{AFX_MSG_MAP(CDynSplitView2)
     ON_WM_ERASEBKGND()
     ON_COMMAND(ID_FILESAVE, OnFilesave)
-    ON_COMMAND(ID_MakegGray, OnMakegGray)
+    ON_COMMAND(ID_MakegGray, OnMakeGray)
     ON_COMMAND(ID_LightAlter, OnLightAlter)
     ON_COMMAND(ID_LightReverse, OnLightReverse)
     ON_COMMAND(ID_ContrastAlter, OnContrastAlter)
@@ -186,11 +186,11 @@ void CDynSplitView2::OnFilesave()
 }
 
 
-void CDynSplitView2::OnMakegGray()   //灰度调整 
+void CDynSplitView2::OnMakeGray()   //灰度调整 
 {
-    clearmem();   //取得原始图像的拷贝文件
-    CDibNew1->MakegGray();   //调用灰度调整函数
-     Invalidate();   //调用刷新函数
+    clearmem();
+    CDibNew1->MakeGray();
+    Invalidate();
 }
 
 void CDynSplitView2::OnLightAlter()   //亮度调整

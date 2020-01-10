@@ -14,6 +14,10 @@
 class MakeColorDib : public CDib  
 {
 public:
+    MakeColorDib();
+    virtual ~MakeColorDib();
+
+public:
     void Mosaic();
     void LowLVBObig();
     void ShuangXiangGROW();
@@ -31,9 +35,7 @@ public:
     void ContrastAlter(int m_Increment);
     void LightReverse();
     void LightAlter(int m_Light);
-    MakeColorDib();
-    virtual ~MakeColorDib();
-    void MakegGray();
+    void MakeGray();
 };
 
 #endif // !defined(AFX_MAKECOLORDIB_H__C1036995_2726_4538_BDAC_B392A7192AD9__INCLUDED_)
