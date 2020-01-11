@@ -72,8 +72,6 @@ void MakeColorDib::MakeGray()
 /***************************************************************/
 void MakeColorDib::LightAlter(int light)
 {
-    ASSERT(this->m_pBitmapInfoHeader->biBitCount == 24);
-
     BYTE *p_data = this->GetData();  //取得原图的数据区指针
     int width = this->GetWidth();    //取得原图的数据区宽度
     int height = this->GetHeight();  //取得原图的数据区高度
@@ -83,7 +81,7 @@ void MakeColorDib::LightAlter(int light)
     {
         for (int x = 0; x < dibWidth; x++)
         {
-            //调整当前点的亮度（rgb同比例变换）
+            //调整当前点的亮度
             int temp = int(*p_data * light / 100); 
             
             //判断范围，取得合理的值
@@ -103,10 +101,8 @@ void MakeColorDib::LightAlter(int light)
 /*函数类型：void                                               */
 /*功能：图像的亮度取反。                                       */
 /***************************************************************/
-void MakeColorDib::LightReverse()    //亮度取反
+void MakeColorDib::LightReverse()
 {
-    ASSERT(this->m_pBitmapInfoHeader->biBitCount == 24);
-
     BYTE *p_data = this->GetData();  //取得原图的数据区指针
     int width = this->GetWidth();    //取得原图的数据区宽度
     int height = this->GetHeight();  //取得原图的数据区高度
@@ -132,8 +128,6 @@ void MakeColorDib::ContrastAlter(int increment)   ///对比度处理
     if (increment == 0) // 保持对比度不变
         return;
    
-    ASSERT(this->m_pBitmapInfoHeader->biBitCount == 24);
-
     BYTE *p_data = this->GetData();  //取得原图的数据区指针
     int width = this->GetWidth();    //取得原图的数据区宽度
     int height = this->GetHeight();  //取得原图的数据区高度
@@ -174,22 +168,22 @@ void MakeColorDib::ContrastAlter(int increment)   ///对比度处理
 /*函数类型：void                                               */
 /*功能：图像曝光处理。                                         */
 /***************************************************************/
-void MakeColorDib::Exposal() //曝光处理
+void MakeColorDib::Exposal()
 {
-    BYTE *p_data;     //原图数据区指针
-    int wide,height,DibWidth;    //原图长、宽、字节宽
-    p_data=this->GetData ();   //取得原图的数据区指针
-    wide=this->GetWidth ();  //取得原图的数据区宽度
-    height=this->GetHeight ();   //取得原图的数据区高度
-    DibWidth=this->GetDibWidthBytes();   //取得原图的每行字节数
-    for(int j=0;j<height;j++)    // 每行
-        for(int i=0;i<DibWidth;i++)    // 每列
+    BYTE *p_data = this->GetData();  //取得原图的数据区指针
+    int width = this->GetWidth();    //取得原图的数据区宽度
+    int height = this->GetHeight();  //取得原图的数据区高度
+    int dibWidth = this->GetDibWidthBytes(); //取得原图的每行字节数
+
+    for (int y = 0; y < height; y++) 
+    {
+        for (int x = 0; x < dibWidth; x++)
         {
-            BYTE* pbydata = p_data++;  //取得当前点的值
-            BYTE a=*pbydata;   //传给临时变量
-            *pbydata=(a>128)?a:(255-a);   //调整
+            if (*p_data < 128)
+                *p_data = 255 - (*p_data);
+            *p_data++;
         }
-        
+    }
 }
 
 /***************************************************************/

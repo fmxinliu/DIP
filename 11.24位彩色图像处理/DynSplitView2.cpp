@@ -224,9 +224,9 @@ void CDynSplitView2::OnContrastAlter()   //对比度调整
 
 void CDynSplitView2::OnExposal()   //图像曝光
 {
-    clearmem();   //取得原始图像的拷贝文件
-    CDibNew1->Exposal();   //调用图像曝光函数
-    Invalidate();       //调用刷新函数
+    clearmem();
+    CDibNew1->Exposal();
+    Invalidate();
 }
 
 void CDynSplitView2::OnPaintColor()  //图像着色
