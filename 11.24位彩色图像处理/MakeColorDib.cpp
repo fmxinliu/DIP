@@ -37,7 +37,7 @@ MakeColorDib::~MakeColorDib()
 /*函数类型：void                                               */
 /*功能：真彩色转化成256色灰度图像。                            */
 /***************************************************************/
-void MakeColorDib::MakeGray()    //灰度变化
+void MakeColorDib::MakeGray()
 {
     ASSERT(this->m_pBitmapInfoHeader->biBitCount == 24);
 
@@ -59,7 +59,7 @@ void MakeColorDib::MakeGray()    //灰度变化
 
             *pbyBlue = gray;     //将取到的最大值赋给像素的蓝分量
             *pbyGreen = gray;    //将取到的最大值赋给像素的绿分量
-            *pbyRed = gray;         //将取到的最大值赋给像素的红分量
+            *pbyRed = gray;      //将取到的最大值赋给像素的红分量
         }
     }
 }
@@ -217,33 +217,40 @@ void MakeColorDib::Exposal() //曝光处理
 }
 
 /***************************************************************/
-/*函数名称：PaintColor(int m_Red,int m_Green,int m_Blue)       */
+/*函数名称：PaintColor(int red, int green, int blue)           */
 /*函数类型：void                                               */
-/*参数：int m_Red、m_Green、m_Blue，用户给定的红绿蓝值         */
+/*参数：int red、green、blue，用户给定的红绿蓝值               */
 /*功能：对图像使用阈值法进行着色处理。                         */
 /***************************************************************/
-void MakeColorDib::PaintColor(int m_Red,int m_Green,int m_Blue) //着色处理
+void MakeColorDib::PaintColor(int red, int green, int blue)
 {
-    BYTE *p_data;     //原图数据区指针
-    int wide,height,DibWidth;    //原图长、宽、字节宽
-    p_data=this->GetData ();   //取得原图的数据区指针
-    wide=this->GetWidth ();  //取得原图的数据区宽度
-    height=this->GetHeight ();   //取得原图的数据区高度
-    DibWidth=this->GetDibWidthBytes();   //取得原图的每行字节数
-    for(int j=0;j<height;j++)    // 每行
-        for(int i=0;i<DibWidth;i+=3)    // 每列
-        {            
-            BYTE* pbyBlue = p_data++;    //取得当前点（蓝色）的值                    
-            BYTE* pbyGreen = p_data++;  //取得当前点（绿色）的值
-            BYTE* pbyRed = p_data++;    //取得当前点（红色）的值
+    ASSERT(this->m_pBitmapInfoHeader->biBitCount == 24);
+
+    BYTE *p_data = this->GetData();  //取得原图的数据区指针
+    int width = this->GetWidth();    //取得原图的数据区宽度
+    int height = this->GetHeight();  //取得原图的数据区高度
+    int dibWidth = this->GetDibWidthBytes(); //取得原图的每行字节数
+
+    for (int y = 0; y < height; y++) 
+    {
+        for (int x = 0; x < dibWidth; x += 3)
+        {
+            BYTE *pbyBlue = p_data++;   //得到蓝色值
+            BYTE *pbyGreen = p_data++;  //得到绿色值
+            BYTE *pbyRed = p_data++;    //得到红色值
             BYTE r = *pbyRed;
             BYTE g = *pbyGreen;
             BYTE b = *pbyBlue;
-            BYTE gray=(BYTE)(((WORD)r * 59 + (WORD)g * 30 + (WORD)b * 11) / 100);
-            *pbyBlue = (BYTE)((m_Blue * gray) / 255);  
-            *pbyGreen = (BYTE)((m_Green * gray) / 255);
-            *pbyRed = (BYTE)((m_Red * gray) / 255);
+
+            //计算灰度值 gray = 0.3r + 0.59g + 0.11b
+            BYTE gray = (BYTE)(((WORD)r * 59 + (WORD)g * 30 + (WORD)b * 11) / 100);
+
+            //根据输入值，计算rgb分量比重
+            *pbyBlue = (BYTE)((blue * gray) / 255); 
+            *pbyGreen = (BYTE)((green * gray) / 255);
+            *pbyRed = (BYTE)((red * gray) / 255);
         }
+    }
 }
 
 /***************************************************************/

@@ -30,7 +30,7 @@ public:
     void Embossment();
     void NeonLight();
     void Smoothness();
-    void PaintColor(int m_Red,int m_Green,int m_Blue);
+    void PaintColor(int red, int green, int blue);
     void Exposal();
     void ContrastAlter(int m_Increment);
     void LightReverse();

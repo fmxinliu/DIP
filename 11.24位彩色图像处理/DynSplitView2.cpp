@@ -229,20 +229,21 @@ void CDynSplitView2::OnExposal()   //图像曝光
 
 void CDynSplitView2::OnPaintColor()  //图像着色
 {
-    PaintColorDlg Dlg;    // 创建对话框
-    Dlg.m_Red = m_byRed;       //设置初始值
-    Dlg.m_Green = m_byGreen;     //设置初始值
-    Dlg.m_Blue = m_byBlue;     //设置初始值
-    int responeDlg = Dlg.DoModal();
-    if(responeDlg == IDOK)      // 显示对话框
+    PaintColorDlg dlg;
+    dlg.m_Red = m_byRed;
+    dlg.m_Green = m_byGreen;
+    dlg.m_Blue = m_byBlue;
+
+    if(dlg.DoModal() == IDOK)
     {
-     m_byRed=Dlg.m_Red;    //取到窗口输入值
-     m_byGreen=Dlg.m_Green;  //取到窗口输入值
-     m_byBlue=Dlg.m_Blue ;      //取到窗口输入值
+        m_byRed=dlg.m_Red;
+        m_byGreen=dlg.m_Green;
+        m_byBlue=dlg.m_Blue; 
     }
-    clearmem();   //取得原始图像的拷贝文件
-    CDibNew1->PaintColor(m_byRed,m_byGreen,m_byBlue);  //调用图像着色函数
-    Invalidate();           //调用刷新函数    
+
+    clearmem();
+    CDibNew1->PaintColor(m_byRed, m_byGreen, m_byBlue);
+    Invalidate();    
 }
 
 void CDynSplitView2::OnSmoothness()  //图像平滑
