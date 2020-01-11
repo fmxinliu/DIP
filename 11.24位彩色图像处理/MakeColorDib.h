@@ -34,7 +34,7 @@ public:
     void Exposal();
     void ContrastAlter(int m_Increment);
     void LightReverse();
-    void LightAlter(int m_Light);
+    void LightAlter(int light);
     void MakeGray();
 };
 

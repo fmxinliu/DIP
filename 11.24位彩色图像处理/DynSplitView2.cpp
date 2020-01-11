@@ -195,12 +195,13 @@ void CDynSplitView2::OnMakeGray()   //灰度调整
 
 void CDynSplitView2::OnLightAlter()   //亮度调整
 {
-    LightDlg dlg;        // 创建对话框
-    dlg.m_Light=0;   //提示用户设定窗口亮度调整值
-    dlg.DoModal();      // 显示对话框
-    clearmem();     //取得原始图像的拷贝文件
-    CDibNew1->LightAlter(dlg.m_Light);  //调用亮度调整函数
-    Invalidate();       //调用刷新函数    
+    LightDlg dlg; 
+    dlg.m_Light=0;
+    dlg.DoModal(); 
+
+    clearmem();
+    CDibNew1->LightAlter(dlg.m_Light);
+    Invalidate();
 }
 
 void CDynSplitView2::OnLightReverse()  //亮度取反

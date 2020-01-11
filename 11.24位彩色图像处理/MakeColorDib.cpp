@@ -65,31 +65,36 @@ void MakeColorDib::MakeGray()
 }
 
 /***************************************************************/
-/*函数名称：LightAlter(int m_Light)                            */
+/*函数名称：LightAlter(int light)                              */
 /*函数类型：void                                               */
-/*参数：int m_Light，用户给定的阈值                            */
+/*参数：int light，用户给定的阈值                              */
 /*功能：对图像使用阈值法进行亮度调整。                         */
 /***************************************************************/
-void MakeColorDib::LightAlter(int m_Light)    //亮度调整
+void MakeColorDib::LightAlter(int light)
 {
-    BYTE *p_data;     //原图数据区指针
-    int wide,height,DibWidth;    //原图长、宽、字节宽
-    p_data=this->GetData ();   //取得原图的数据区指针
-    wide=this->GetWidth ();  //取得原图的数据区宽度
-    height=this->GetHeight ();    //取得原图的数据区高度
-    DibWidth=this->GetDibWidthBytes();   //取得原图的每行字节数
-    for(int j=0;j<height;j++)    // 每行
-    for(int i=0;i<DibWidth;i++)    // 每列
-    {   
-        int a=0;
-        a=int(*p_data*m_Light/100);   //调整当前点的亮度
-        *p_data=a;
-        //判断范围，取得合理的值
-        if(a<0) 
-            *p_data=0;  
-        if(a>255)
-            *p_data=255;
-        p_data++;   //指向下一指针
+    ASSERT(this->m_pBitmapInfoHeader->biBitCount == 24);
+
+    BYTE *p_data = this->GetData();  //取得原图的数据区指针
+    int width = this->GetWidth();    //取得原图的数据区宽度
+    int height = this->GetHeight();  //取得原图的数据区高度
+    int dibWidth = this->GetDibWidthBytes(); //取得原图的每行字节数
+
+    for (int y = 0; y < height; y++) 
+    {
+        for (int x = 0; x < dibWidth; x++)
+        {
+            //调整当前点的亮度（rgb同比例变换）
+            int temp = int(*p_data * light / 100); 
+            
+            //判断范围，取得合理的值
+            if (temp < 0) 
+                *p_data = 0;
+            else if (temp > 255)
+                *p_data = 255;
+            else
+                *p_data = temp;
+            p_data++;
+        }
     }
 }
 
