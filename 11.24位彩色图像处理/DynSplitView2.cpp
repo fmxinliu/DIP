@@ -206,9 +206,9 @@ void CDynSplitView2::OnLightAlter()   //亮度调整
 
 void CDynSplitView2::OnLightReverse()  //亮度取反
 {
-    clearmem();   //取得原始图像的拷贝文件
-    CDibNew1->LightReverse();     //调用亮度取反函数
-    Invalidate();   //调用刷新函数
+    clearmem();
+    CDibNew1->LightReverse();
+    Invalidate();
 }
 
 void CDynSplitView2::OnContrastAlter()   //对比度调整
