@@ -213,12 +213,13 @@ void CDynSplitView2::OnLightReverse()  //亮度取反
 
 void CDynSplitView2::OnContrastAlter()   //对比度调整
 {
-    ContrastDlg dlg;   // 创建对话框
-    dlg.m_Increment=0;  //设置初始值
-    dlg.DoModal();   // 显示对话框
-    clearmem();       //取得原始图像的拷贝文件
-    CDibNew1->ContrastAlter(dlg.m_Increment);  //取到输入值，调用对比度调整函数
-    Invalidate();           //调用刷新函数    
+    ContrastDlg dlg;
+    dlg.m_Increment=0;
+    dlg.DoModal();
+
+    clearmem();
+    CDibNew1->ContrastAlter(dlg.m_Increment);
+    Invalidate();
 }
 
 void CDynSplitView2::OnExposal()   //图像曝光

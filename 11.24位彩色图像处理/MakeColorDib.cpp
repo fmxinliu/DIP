@@ -121,80 +121,50 @@ void MakeColorDib::LightReverse()    //亮度取反
 }
 
 /***************************************************************/
-/*函数名称：ContrastAlter(int m_Increment)                     */
+/*函数名称：ContrastAlter(int increment)                       */
 /*函数类型：void                                               */
-/*参数：int m_Increment，用户给定的阈值                        */
+/*参数：int increment，用户给定的阈值                          */
 /*功能：对图像使用阈值法调整对比度处理。                       */
 /***************************************************************/
-void MakeColorDib::ContrastAlter(int m_Increment)   ///对比度处理
+void MakeColorDib::ContrastAlter(int increment)   ///对比度处理
 {
-    int nHigh = 255 - m_Increment;
-    //对于极端情况加以处理
-    if(nHigh < m_Increment)
+    if (increment == 0) // 保持对比度不变
+        return;
+   
+    ASSERT(this->m_pBitmapInfoHeader->biBitCount == 24);
+
+    BYTE *p_data = this->GetData();  //取得原图的数据区指针
+    int width = this->GetWidth();    //取得原图的数据区宽度
+    int height = this->GetHeight();  //取得原图的数据区高度
+    int dibWidth = this->GetDibWidthBytes(); //取得原图的每行字节数
+
+    if (increment < 0) // 减小对比度
     {
-        nHigh = 127;
-        m_Increment = 120;
-    }
-    if(m_Increment < -127)
-        m_Increment = -120;
-    //扩展或压缩区间的长度
-    int nStretch = 255;
-    if(m_Increment >= 0)
-        nStretch = 255 - 2 * m_Increment;
-    else
-        nStretch = 255 + 2 * m_Increment;
-    BYTE *p_data;     //原图数据区指针
-    int wide,height,DibWidth;    //原图长、宽、字节宽
-    p_data=this->GetData ();   //取得原图的数据区指针
-    wide=this->GetWidth ();  //取得原图的数据区宽度
-    height=this->GetHeight ();   //取得原图的数据区高度
-    DibWidth=this->GetDibWidthBytes();   //取得原图的每行字节数
-    if(m_Increment >= 0)   // m_Increment>=0时
-    {
-        for(int j=0;j<height;j++)    // 每行
-            for(int i=0;i<DibWidth-3;i+=3)    // 每列
-            {   
-                //取得当前点（蓝色）的值，调整
-                BYTE* pbyBlue = p_data++;    
-                if(*pbyBlue<=m_Increment)
-                    *pbyBlue=0;
-                else if(*pbyBlue>nHigh)
-                    *pbyBlue=255;
-                else
-                    *pbyBlue=(BYTE)((((int)*pbyBlue - m_Increment) * 255) / nStretch );
-                //取得当前点（绿色）的值，调整
-                BYTE* pbyGreen = p_data++;
-                if(*pbyGreen<=m_Increment)
-                    *pbyGreen=0;
-                else if(*pbyGreen>nHigh)
-                    *pbyGreen=255;
-                else
-                    *pbyGreen=(BYTE)((((int)*pbyGreen - m_Increment) * 255) / nStretch );
-                //取得当前点（红色）的值，调整
-                BYTE* pbyRed = p_data++;
-                if(*pbyRed<=m_Increment)
-                    *pbyRed=0;
-                else if(*pbyRed>nHigh)
-                    *pbyRed=255;
-                else
-                    *pbyRed=(BYTE)((((int)*pbyRed - m_Increment) * 255) / nStretch );
+        int nStretch = 255 + 2 * increment;
+        for (int y = 0; y < height; y++) 
+        {
+            for (int x = 0; x < dibWidth; x++)
+            {
+                *p_data++ = (BYTE)(((*p_data) * nStretch) / 255 - increment); // g = f * ((255 + 2 * n) / 255) - n (n < 0)
             }
-            
+        }
     }
-    else  // m_Increment < 0 时
+    else // 增加对比度
     {
-        for(int j=0;j<height;j++)
-            for(int i=0;i<DibWidth-3;i+=3)
-            {    //取得当前点（蓝色）的值，调整
-                BYTE* pbyBlue = p_data++;
-                *pbyBlue = (BYTE)((((int)(*pbyBlue) * nStretch) / 255) - m_Increment);
-                //取得当前点（红色）的值，调整
-                BYTE* pbyGreen = p_data++;
-                *pbyGreen = (BYTE)((((int)(*pbyGreen) * nStretch) / 255) - m_Increment);
-                //取得当前点（红色）的值，调整
-                BYTE* pbyRed = p_data++;
-                *pbyRed = (BYTE)((((int)(*pbyRed) * nStretch) / 255) - m_Increment);                
+        int nStretch = 255 - 2 * increment;
+        for (int y = 0; y < height; y++) 
+        {
+            for (int x = 0; x < dibWidth; x++)
+            {
+                if (*p_data < increment)
+                    *p_data = 0;
+                else if (*p_data > 255 - increment)
+                    *p_data = 255;
+                else
+                    *p_data = (BYTE)((((*p_data) - increment) * 255) / nStretch); // g = (f - n) * 255 / (255 - 2 * n)
+                p_data++;
             }
+        }
     }
 }
 

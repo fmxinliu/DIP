@@ -32,7 +32,7 @@ public:
     void Smoothness();
     void PaintColor(int red, int green, int blue);
     void Exposal();
-    void ContrastAlter(int m_Increment);
+    void ContrastAlter(int increment);
     void LightReverse();
     void LightAlter(int light);
     void MakeGray();
