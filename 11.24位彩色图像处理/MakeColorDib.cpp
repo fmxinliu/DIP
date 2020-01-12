@@ -340,29 +340,32 @@ void MakeColorDib::Embossment()   //浮雕处理
 /*函数类型：void                                               */
 /*功能：图像扩散处理。                                         */
 /***************************************************************/
-void MakeColorDib::Spread()   //扩散处理
-{ 
-    BYTE *p_data;     //原图数据区指针
-    int wide,height,DibWidth;    //原图长、宽、字节宽
-    p_data=this->GetData ();   //取得原图的数据区指针
-    wide=this->GetWidth ();  //取得原图的数据区宽度
-    height=this->GetHeight ();   //取得原图的数据区高度
-    DibWidth=this->GetDibWidthBytes();   //取得原图的每行字节数
-    BYTE *p_temp=new BYTE[height*DibWidth];    // 暂时分配内存，以保存新图像
-    for(int j=0;j<height-4;j++)    // 每行
+void MakeColorDib::Spread() // 引入一些随机性，使图像如油画一般
+{
+    ASSERT(this->m_pBitmapInfoHeader->biBitCount == 24);
+
+    BYTE *p_data = this->GetData();  //取得原图的数据区指针
+    int width = this->GetWidth();    //取得原图的数据区宽度
+    int height = this->GetHeight();  //取得原图的数据区高度
+    int dibWidth = this->GetDibWidthBytes(); //取得原图的每行字节数
+    
+    int size = dibWidth * height;
+    BYTE *p_temp = new BYTE[size];
+
+    // 从5*5邻域随机获取像素填充到当前位置
+    for (int y = 2; y < height - 2; y++) 
     {
-        for(int i=0;i<DibWidth-14;i++)    // 每列
+        for (int x = 2 * 3; x < dibWidth - 2 * 3; x++)
         {
-             int m=0,n=0;
-             m=rand()%5; //取得行随机数
-             n=rand()%5; //取得列随机数
-             int pby_pt=0;    
-             pby_pt=*(p_data+(height-j-1-m)*DibWidth+i+3*n);//得到对应随机像素值
-             *(p_temp+(height-j-3)*DibWidth+i+6)=pby_pt;
+            int m = rand() % 5 - 2; //取得行随机数
+            int n = rand() % 5 - 2; //取得列随机数
+
+            p_temp[dibWidth * y + x] = p_data[dibWidth * (y + n) + (x + m * 3)];
         }
     }
-    memcpy(p_data,p_temp,height*DibWidth);  // 复制处理后的图像
-    delete []p_temp;   //删除暂时分配内存
+
+    memcpy(p_data, p_temp, size);
+    delete []p_temp;
 }
 
 /***************************************************************/

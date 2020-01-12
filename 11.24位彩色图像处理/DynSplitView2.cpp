@@ -271,9 +271,9 @@ void CDynSplitView2::OnEmbossment()   //图像浮雕
 
 void CDynSplitView2::OnSpread() //图像扩散
 {
-    clearmem();   //取得原始图像的拷贝文件
-    CDibNew1->Spread();  //调用图像扩散函数
-    Invalidate();       //调用刷新函数
+    clearmem();
+    CDibNew1->Spread();
+    Invalidate();
 }
 
 void CDynSplitView2::OnSharp() //图像锐化
