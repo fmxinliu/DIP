@@ -256,9 +256,9 @@ void CDynSplitView2::OnSmoothness()  //图像平滑
 
 void CDynSplitView2::OnNeonLight() //图像霓虹
 {
-    clearmem();   //取得原始图像的拷贝文件
-    CDibNew1->NeonLight();   //调用图像霓虹函数
-    Invalidate();           //调用刷新函数    
+    clearmem();
+    CDibNew1->NeonLight();
+    Invalidate();  
 }
 
 void CDynSplitView2::OnEmbossment()   //图像浮雕

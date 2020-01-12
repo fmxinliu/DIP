@@ -224,39 +224,87 @@ void MakeColorDib::PaintColor(int red, int green, int blue)
 }
 
 /***************************************************************/
+/*函数名称：Embossment()                                       */
+/*函数类型：void                                               */
+/*功能：产生图像浮雕处理效果。                                 */
+/***************************************************************/
+void MakeColorDib::Embossment()
+{
+    int rgbChannel = (this->m_pBitmapInfoHeader->biBitCount == 24) ? 3 : 1;
+
+    BYTE *p_data = this->GetData();  //取得原图的数据区指针
+    int width = this->GetWidth();    //取得原图的数据区宽度
+    int height = this->GetHeight();  //取得原图的数据区高度
+    int dibWidth = this->GetDibWidthBytes(); //取得原图的每行字节数
+
+    int size = dibWidth * height;
+    BYTE *p_temp = new BYTE[size];
+
+    for (int y = 0; y < height; y++) 
+    {
+        for (int x = 0; x < dibWidth - rgbChannel; x++)
+        {
+            //突出变化部分，淡化相同部分
+            int currIndex = dibWidth * y + x; // 当前像素
+            int rightIndex = dibWidth * y + x + rgbChannel; // 后一像素
+            int temp = p_data[currIndex] - p_data[rightIndex] + 128;
+
+            //判断范围，取得合理的值
+            if (temp < 0) 
+                p_temp[currIndex] = 0;
+            else if (temp > 255)
+                p_temp[currIndex] = 255;
+            else
+                p_temp[currIndex] = temp;
+        }
+    }
+
+    memcpy(p_data, p_temp, size);
+    delete []p_temp;
+}
+
+/***************************************************************/
 /*函数名称：NeonLight()                                        */
 /*函数类型：void                                               */
 /*功能：使图像产生霓虹处理效果。                               */
 /***************************************************************/
-void MakeColorDib::NeonLight()   //霓虹处理
+void MakeColorDib::NeonLight()
 {
-    BYTE *p_data;     //原图数据区指针
-    int wide,height,DibWidth;    //原图长、宽、字节宽
-    p_data=this->GetData ();   //取得原图的数据区指针
-    wide=this->GetWidth ();  //取得原图的数据区宽度
-    height=this->GetHeight ();   //取得原图的数据区高度
-    DibWidth=this->GetDibWidthBytes();   //取得原图的每行字节数
-    BYTE *p_temp=new BYTE[height*DibWidth];    // 暂时分配内存，以保存新图像
-    for(int j=0;j<height-4;j++)    // 每行
+    int rgbChannel = (this->m_pBitmapInfoHeader->biBitCount == 24) ? 3 : 1;
+
+    BYTE *p_data = this->GetData();  //取得原图的数据区指针
+    int width = this->GetWidth();    //取得原图的数据区宽度
+    int height = this->GetHeight();  //取得原图的数据区高度
+    int dibWidth = this->GetDibWidthBytes(); //取得原图的每行字节数
+
+    int size = dibWidth * height;
+    BYTE *p_temp = new BYTE[size];
+
+    for (int y = 0; y < height - 1; y++) 
     {
-        for(int i=0;i<DibWidth-1;i++)    // 每列
+        for (int x = 0; x < dibWidth - rgbChannel; x++)
         {
-             int pby_pt=0;
-             //对像素执行算法
-             pby_pt=(*(p_data+(height-j-1)*DibWidth+i)-*(p_data+(height-j-1)*DibWidth+i+3))
-                   *(*(p_data+(height-j-1)*DibWidth+i)-*(p_data+(height-j-1)*DibWidth+i+3))
-                   +(*(p_data+(height-j-1)*DibWidth+i)-*(p_data+(height-j-2)*DibWidth+i))
-                   *(*(p_data+(height-j-1)*DibWidth+i)-*(p_data+(height-j-2)*DibWidth+i));
-            *(p_temp+(height-j-1)*DibWidth+i)=2*int(sqrt((float)pby_pt));
-            //判断合法性
-            if(*(p_temp+(height-j-1)*DibWidth+i)<0)
-                 *(p_temp+(height-j-1)*DibWidth+i)=0;
-            if(*(p_temp+(height-j-1)*DibWidth+i)>255)
-                 *(p_temp+(height-j-1)*DibWidth+i)=255;
+            //突出变化部分，淡化相同部分
+            int currIndex = dibWidth * y + x; // 当前像素
+            int rightIndex = dibWidth * y + x + rgbChannel; // 后一像素
+            int nextIndex = dibWidth * (y + 1) + x; // 下一像素
+            int temp = 0;
+            temp = (p_data[currIndex] - p_data[rightIndex])
+                 * (p_data[currIndex] - p_data[rightIndex])
+                 + (p_data[currIndex] - p_data[nextIndex])
+                 * (p_data[currIndex] - p_data[nextIndex]);
+            temp = 2 * int(sqrt((float)temp));
+   
+            //判断范围，取得合理的值
+            if (temp > 255)
+                p_temp[currIndex] = 255;
+            else
+                p_temp[currIndex] = temp;
         }
     }
-    memcpy(p_data,p_temp,height*DibWidth);  // 复制处理后的图像
-    delete []p_temp;   //删除暂时分配内存
+
+    memcpy(p_data, p_temp, size);
+    delete []p_temp;
 }
 
 /***************************************************************/
@@ -301,44 +349,6 @@ void MakeColorDib::Smoothness()
 
             //取总和的的平均值
             p_temp[dibWidth * y + x] = (BYTE)abs(temp / 9);
-        }
-    }
-
-    memcpy(p_data, p_temp, size);
-    delete []p_temp;
-}
-
-/***************************************************************/
-/*函数名称：Embossment()                                       */
-/*函数类型：void                                               */
-/*功能：产生图像浮雕处理效果。                                 */
-/***************************************************************/
-void MakeColorDib::Embossment()
-{
-    BYTE *p_data = this->GetData();  //取得原图的数据区指针
-    int width = this->GetWidth();    //取得原图的数据区宽度
-    int height = this->GetHeight();  //取得原图的数据区高度
-    int dibWidth = this->GetDibWidthBytes(); //取得原图的每行字节数
-
-    int size = dibWidth * height;
-    BYTE *p_temp = new BYTE[size];
-
-    for (int y = 0; y < height; y++) 
-    {
-        for (int x = 0; x < dibWidth - 3; x++)
-        {
-            //对像素得每个分量执行算法
-            int currIndex = dibWidth * y + x;
-            int nextIndex = dibWidth * y + x + 3;
-            int temp = p_data[currIndex] - p_data[nextIndex] + 128;
-
-            //判断范围，取得合理的值
-            if (temp < 0) 
-                p_temp[currIndex] = 0;
-            else if (temp > 255)
-                p_temp[currIndex] = 255;
-            else
-                p_temp[currIndex] = temp;
         }
     }
 
