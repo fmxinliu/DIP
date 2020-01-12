@@ -384,30 +384,34 @@ void MakeColorDib::Spread() // 引入一些随机性，使图像如油画一般
 /*函数类型：void                                               */
 /*功能：图像锐化处理。                                         */
 /***************************************************************/
-void MakeColorDib::Sharp()   //图像锐化
+void MakeColorDib::Sharp()
 {
-     BYTE *p_data;     //原图数据区指针
-    int wide,height,DibWidth;    //原图长、宽、字节宽
-    p_data=this->GetData ();   //取得原图的数据区指针
-    wide=this->GetWidth ();  //取得原图的数据区宽度
-    height=this->GetHeight ();   //取得原图的数据区高度
-    DibWidth=this->GetDibWidthBytes();   //取得原图的每行字节数
-    BYTE *p_temp=new BYTE[height*DibWidth];
-    for(int j=0;j<height-1;j++)    // 每行
+    int rgbChannel = (this->m_pBitmapInfoHeader->biBitCount == 24) ? 3 : 1;
+
+    BYTE *p_data = this->GetData();  //取得原图的数据区指针
+    int width = this->GetWidth();    //取得原图的数据区宽度
+    int height = this->GetHeight();  //取得原图的数据区高度
+    int dibWidth = this->GetDibWidthBytes(); //取得原图的每行字节数
+
+    int size = dibWidth * height;
+    BYTE *p_temp = new BYTE[size];
+
+    for (int y = 0; y < height - 1; y++) 
     {
-        for(int i=0;i<DibWidth-5;i++)    // 每列
+        for (int x = 0; x < dibWidth - rgbChannel; x++)
         {
-            int pby_pt=0;    
-            pby_pt= *(p_data+(height-j-2)*DibWidth+i+3)
-                   -*(p_data+(height-j-1)*DibWidth+i);
-            *(p_temp+(height-j-2)*DibWidth+i+3)=*(p_data+(height-j-2)*DibWidth+i+3)
-                                                 +abs(int(pby_pt/4));
-            if(*(p_temp+(height-j-2)*DibWidth+i+3)>255)
-               *(p_temp+(height-j-2)*DibWidth+i+3)=255;
+            int temp = 0;
+            temp = p_data[dibWidth * (height - y - 2) + (x + rgbChannel)] - p_data[dibWidth * (height - y - 1) + x]; // 左对角线像素差
+            temp = p_data[dibWidth * (height - y - 2) + (x + rgbChannel)] + abs(temp) / 4; // 锐化系数 1/4
+            
+            // 直接赋值，不同于像素超限置 255 
+            p_temp[dibWidth * (height - y - 2) + (x + rgbChannel)] = temp; // #1
+            //p_temp[dibWidth * (height - y - 2) + (x + rgbChannel)] = (temp > 255) ? 255 : temp; // #2
         }
     }
-    memcpy(p_data,p_temp,height*DibWidth);  // 复制处理后的图像
-    delete []p_temp;  //删除暂时分配内存
+
+    memcpy(p_data, p_temp, size);
+    delete []p_temp;
 }
 
 /***************************************************************/

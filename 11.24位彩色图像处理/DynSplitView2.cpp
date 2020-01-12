@@ -276,11 +276,11 @@ void CDynSplitView2::OnSpread() //图像扩散
     Invalidate();
 }
 
-void CDynSplitView2::OnSharp() //图像锐化
+void CDynSplitView2::OnSharp()
 {
-    clearmem();   //取得原始图像的拷贝文件
-    CDibNew1->Sharp();  //调用图像锐化函数
-    Invalidate();       //调用刷新函数    
+    clearmem();
+    CDibNew1->Sharp();
+    Invalidate(); 
 }
 
 void CDynSplitView2::OnHighLVBO() ///高通滤波(基本)
