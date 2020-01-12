@@ -24,7 +24,7 @@ public:
     void ChuiZhiGROW();
     void ShuiPingGROW();
     void LowLVBO();
-    void HighLVBO(int m_GaoTong);
+    void HighLVBO(int gaoTong);
     void Sharp();
     void Spread();
     void Embossment();

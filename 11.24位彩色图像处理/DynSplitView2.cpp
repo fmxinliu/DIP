@@ -21,8 +21,7 @@ IMPLEMENT_DYNCREATE(CDynSplitView2, CView)
 CDynSplitView2::CDynSplitView2()
 {
     state2=0;
-       m_byRed = m_byGreen = m_byBlue = 255;
-    m_GaoTong=0;
+    m_byRed = m_byGreen = m_byBlue = 255;
 }
 
 void CDynSplitView2::clearmem()
@@ -285,25 +284,24 @@ void CDynSplitView2::OnSharp()
 
 void CDynSplitView2::OnHighLVBO() ///高通滤波(基本)
 {  
-    m_GaoTong=1;   //设置标志
-    clearmem();   //取得原始图像的拷贝文件
-    CDibNew1->HighLVBO(m_GaoTong);  //调用高通滤波(基本)函数
-    Invalidate();           //调用刷新函数
+    clearmem();
+    CDibNew1->HighLVBO(1);
+    Invalidate();
 }
-void CDynSplitView2::OnHighLVBOnormal() //高通滤波（中等）
+
+void CDynSplitView2::OnHighLVBOnormal() ///高通滤波（中等）
 {
-    m_GaoTong=2;  //设置标志
-    clearmem();   //取得原始图像的拷贝文件
-    CDibNew1->HighLVBO(m_GaoTong);  //调用高通滤波（中等）函数
-    Invalidate();       //调用刷新函数
+    clearmem();
+    CDibNew1->HighLVBO(2);
+    Invalidate();
 }
 
 void CDynSplitView2::OnHighLVBOexcessive() ///高通滤波（过量）
 { 
-    m_GaoTong=3;    //设置标志
-    clearmem();   //取得原始图像的拷贝文件
-    CDibNew1->HighLVBO(m_GaoTong);  //调用高通滤波（过量）函数
-    Invalidate();       //调用刷新函数
+
+    clearmem();
+    CDibNew1->HighLVBO(3);
+    Invalidate();
 }
 
 void CDynSplitView2::OnLowLVBO() //低通滤波(3x3)

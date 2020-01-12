@@ -24,14 +24,13 @@ public:
 int      m_byRed,m_byGreen,m_byBlue;
 // Operations
 public:
-        CPalette *CreateBitmapPalette( MakeColorDib* pBitmap);
-         CString filename;
-        MakeColorDib *CDibNew1;
-        CDib *CDib1;
-        CPalette hPalette;
-        int state2;
-        void clearmem();
-        int m_GaoTong;
+    CPalette *CreateBitmapPalette( MakeColorDib* pBitmap);
+    CString filename;
+    MakeColorDib *CDibNew1;
+    CDib *CDib1;
+    CPalette hPalette;
+    int state2;
+    void clearmem();
 
 // Overrides
     // ClassWizard generated virtual function overrides
