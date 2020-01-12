@@ -250,9 +250,9 @@ void CDynSplitView2::OnPaintColor()  //图像着色
 
 void CDynSplitView2::OnSmoothness()  //图像平滑
 {
-    clearmem();   //取得原始图像的拷贝文件
-    CDibNew1->Smoothness();    //调用图像平滑函数
-    Invalidate();           //调用刷新函数
+    clearmem();
+    CDibNew1->Smoothness();
+    Invalidate();
 }
 
 void CDynSplitView2::OnNeonLight() //图像霓虹
@@ -306,18 +306,18 @@ void CDynSplitView2::OnHighLVBOexcessive() ///高通滤波（过量）
     Invalidate();       //调用刷新函数
 }
 
-void CDynSplitView2::OnLowLVBO() ///低通滤波(3x3)
+void CDynSplitView2::OnLowLVBO() //低通滤波(3x3)
 {
-    clearmem();   //取得原始图像的拷贝文件
-    CDibNew1->LowLVBO();  //调用低通滤波(3x3)函数
-    Invalidate();           //调用刷新函数
+    clearmem();
+    CDibNew1->LowLVBO();
+    Invalidate();
 }
 
 void CDynSplitView2::OnLowLVBObig()   //低通滤波(5x5)
 {
-    clearmem();   //取得原始图像的拷贝文件
-    CDibNew1->LowLVBObig();   //调用低通滤波(5x5)函数
-    Invalidate();           //调用刷新函数
+    clearmem();
+    CDibNew1->LowLVBObig();
+    Invalidate();
 }
 
 void CDynSplitView2::OnShuiPingGROW() ///水平增强
