@@ -306,33 +306,37 @@ void MakeColorDib::Smoothness()   //平滑处理
 /*函数类型：void                                               */
 /*功能：产生图像浮雕处理效果。                                 */
 /***************************************************************/
-void MakeColorDib::Embossment()   //浮雕处理
+void MakeColorDib::Embossment()
 {
-    BYTE *p_data;     //原图数据区指针
-    int wide,height,DibWidth;    //原图长、宽、字节宽
-    p_data=this->GetData ();   //取得原图的数据区指针
-    wide=this->GetWidth ();  //取得原图的数据区宽度
-    height=this->GetHeight ();   //取得原图的数据区高度
-    DibWidth=this->GetDibWidthBytes();   //取得原图的每行字节数
-    BYTE *p_temp=new BYTE[height*DibWidth];    // 暂时分配内存，以保存新图像
-    for(int j=0;j<height;j++)    // 每行
+    BYTE *p_data = this->GetData();  //取得原图的数据区指针
+    int width = this->GetWidth();    //取得原图的数据区宽度
+    int height = this->GetHeight();  //取得原图的数据区高度
+    int dibWidth = this->GetDibWidthBytes(); //取得原图的每行字节数
+
+    int size = dibWidth * height;
+    BYTE *p_temp = new BYTE[size];
+
+    for (int y = 0; y < height; y++) 
     {
-        for(int i=0;i<DibWidth-4;i++)    // 每列
+        for (int x = 0; x < dibWidth - 3; x++)
         {
-             int pby_pt=0;
-             //对像素得每个分量执行算法
-             pby_pt=*(p_data+(height-j-1)*DibWidth+i)
-                   -*(p_data+(height-j-1)*DibWidth+i+3)+128;
-             *(p_temp+(height-j-1)*DibWidth+i+3)=pby_pt;
-            //检验合法性
-            if(*(p_temp+(height-j-1)*DibWidth+i+3)<0)
-                *(p_temp+(height-j-1)*DibWidth+i+3)=0;
-            else if(*(p_temp+(height-j-1)*DibWidth+i+3)>255)
-                *(p_temp+(height-j-1)*DibWidth+i+3)=255;
+            //对像素得每个分量执行算法
+            int currIndex = dibWidth * y + x;
+            int nextIndex = dibWidth * y + x + 3;
+            int temp = p_data[currIndex] - p_data[nextIndex] + 128;
+
+            //判断范围，取得合理的值
+            if (temp < 0) 
+                p_temp[currIndex] = 0;
+            else if (temp > 255)
+                p_temp[currIndex] = 255;
+            else
+                p_temp[currIndex] = temp;
         }
     }
-    memcpy(p_data,p_temp,height*DibWidth);  // 复制处理后的图像
-    delete []p_temp;   //删除暂时分配内存
+
+    memcpy(p_data, p_temp, size);
+    delete []p_temp;
 }
 
 /***************************************************************/

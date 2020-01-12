@@ -264,9 +264,9 @@ void CDynSplitView2::OnNeonLight() //图像霓虹
 
 void CDynSplitView2::OnEmbossment()   //图像浮雕
 {
-    clearmem();   //取得原始图像的拷贝文件
-    CDibNew1->Embossment();   //调用图像浮雕函数
-    Invalidate();           //调用刷新函数    
+    clearmem();
+    CDibNew1->Embossment();
+    Invalidate();  
 }
 
 void CDynSplitView2::OnSpread() //图像扩散
