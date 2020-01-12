@@ -343,7 +343,7 @@ void CDynSplitView2::OnShuangXiangGROW() ///双向增强
 
 void CDynSplitView2::OnMosaic() // 马赛克
 {
-    clearmem();   //取得原始图像的拷贝文件
-    CDibNew1->Mosaic();  //调用马赛克处理函数
-    Invalidate();    //调用刷新函数
+    clearmem();
+    CDibNew1->Mosaic();
+    Invalidate();
 }

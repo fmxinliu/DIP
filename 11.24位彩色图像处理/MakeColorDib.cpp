@@ -346,7 +346,7 @@ void MakeColorDib::Embossment()
 /***************************************************************/
 void MakeColorDib::Spread() // 引入一些随机性，使图像如油画一般
 {
-    ASSERT(this->m_pBitmapInfoHeader->biBitCount == 24);
+    int rgbChannel = (this->m_pBitmapInfoHeader->biBitCount == 24) ? 3 : 1;
 
     BYTE *p_data = this->GetData();  //取得原图的数据区指针
     int width = this->GetWidth();    //取得原图的数据区宽度
@@ -359,12 +359,12 @@ void MakeColorDib::Spread() // 引入一些随机性，使图像如油画一般
     // 从5*5邻域随机获取像素填充到当前位置
     for (int y = 2; y < height - 2; y++) 
     {
-        for (int x = 2 * 3; x < dibWidth - 2 * 3; x++)
+        for (int x = 2 * rgbChannel; x < dibWidth - 2 * rgbChannel; x++)
         {
             int m = rand() % 5 - 2; //取得行随机数
             int n = rand() % 5 - 2; //取得列随机数
 
-            p_temp[dibWidth * y + x] = p_data[dibWidth * (y + n) + (x + m * 3)];
+            p_temp[dibWidth * y + x] = p_data[dibWidth * (y + n) + (x + m * rgbChannel)];
         }
     }
 
@@ -692,58 +692,38 @@ void MakeColorDib::ShuangXiangGROW()    //双向增强
 /*函数类型：void                                               */
 /*功能：使图像产生马赛克效果。                                 */
 /***************************************************************/
-void MakeColorDib::Mosaic()    //马赛克
+void MakeColorDib::Mosaic()
 {
-    int m;
-    BYTE *p_data;     //原图数据区指针
-    int wide,height,DibWidth;    //原图长、宽、字节宽
-    p_data=this->GetData ();   //取得原图的数据区指针
-    wide=this->GetWidth ();  //取得原图的数据区宽度
-    height=this->GetHeight ();   //取得原图的数据区高度
-    DibWidth=this->GetDibWidthBytes();   //取得原图的每行字节数
-    BYTE *p_temp=new BYTE[height*DibWidth];    // 暂时分配内存，以保存新图像
-    for(int j=0;j<height-4;j+=5)    // 每行
-    {    
-        for(int i=0;i<DibWidth-14;i+=15)    // 每列
-        {   //对应周围(5x5)矩阵蓝色值求和平均
-            int pby_pt=0;
-            for(int m=0;m<5;m++)
-                for(int n=0;n<15;n+=3)
-                {   
-                    pby_pt+=*(p_data+(height-j-1-m)*DibWidth+i+n);
-                }
-                
-            for(m=0;m<5;m++)
-                for(int n=0;n<14;n+=3)
-                {
-                    *(p_temp+(height-j-1-m)*DibWidth+i+n)=int(pby_pt/25);
-                }    
-            //对应周围(5x5)矩阵绿色值求和平均
-            pby_pt=0;
-            for(m=0;m<5;m++)
-                for(int n=0;n<15;n+=3)
-                {
-                    pby_pt+=*(p_data+(height-j-1-m)*DibWidth+i+n+1);
-                }
-            for(m=0;m<5;m++)
-                for(int n=0;n<14;n+=3)
-                {
-                    *(p_temp+(height-j-1-m)*DibWidth+i+n+1)=int(pby_pt/25);
-                }
-            //对应周围(5x5)矩阵红色值求和平均
-            pby_pt=0;
-            for(m=0;m<5;m++)
-                for(int n=0;n<15;n+=3)
-                {
-                    pby_pt+=*(p_data+(height-j-1-m)*DibWidth+i+n+2);
-                }
-            for(m=0;m<5;m++)
-                for(int n=0;n<14;n+=3)
-                {
-                    *(p_temp+(height-j-1-m)*DibWidth+i+n+2)=int(pby_pt/25);
-                }
-        }            
+    int rgbChannel = (this->m_pBitmapInfoHeader->biBitCount == 24) ? 3 : 1;
+
+    BYTE *p_data = this->GetData();  //取得原图的数据区指针
+    int width = this->GetWidth();    //取得原图的数据区宽度
+    int height = this->GetHeight();  //取得原图的数据区高度
+    int dibWidth = this->GetDibWidthBytes(); //取得原图的每行字节数
+
+    int size = dibWidth * height;
+    BYTE *p_temp = new BYTE[size];
+
+    // 分块，块内填充5*5邻域平均值
+    for (int y = 2; y < height - 2; y += 5) 
+    {
+        for (int x = 2; x < width - 2; x += 5)
+        {
+            for (int k = 0; k < rgbChannel; k++)
+            {
+                int sum = 0;       
+                for (int n = -2; n <= 2; n++)
+                    for (int m = -2; m <= 2; m++)
+                        sum += p_data[dibWidth * (y + n) + ((x + m) * rgbChannel + k)];
+
+                int avg = sum / 25;
+                for (int n = -2; n <= 2; n++)
+                    for (int m = -2; m <= 2; m++)
+                        p_temp[dibWidth * (y + n) + ((x + m) * rgbChannel + k)] = (BYTE)avg;
+            }   
+        }
     }
-    memcpy(p_data,p_temp,height*DibWidth);  // 复制处理后的图像
-    delete []p_temp;  //删除暂时分配内存
+
+    memcpy(p_data, p_temp, size);
+    delete []p_temp;
 }
