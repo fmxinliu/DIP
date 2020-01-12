@@ -322,23 +322,23 @@ void CDynSplitView2::OnLowLVBObig()   //低通滤波(5x5)
 
 void CDynSplitView2::OnShuiPingGROW() ///水平增强
 {
-    clearmem();   //取得原始图像的拷贝文件
-    CDibNew1->ShuiPingGROW();  //调用水平增强函数
-    Invalidate();       //调用刷新函数
+    clearmem();
+    CDibNew1->ShuiPingGROW();
+    Invalidate();
 }
 
 void CDynSplitView2::OnChuiZhiGROW() ///垂直增强
 {
-    clearmem();   //取得原始图像的拷贝文件
-    CDibNew1->ChuiZhiGROW();   //调用垂直增强函数
-    Invalidate();       //调用刷新函数
+    clearmem();
+    CDibNew1->ChuiZhiGROW();
+    Invalidate();
 }
 
 void CDynSplitView2::OnShuangXiangGROW() ///双向增强
 {
-    clearmem();   //取得原始图像的拷贝文件
-    CDibNew1->ShuangXiangGROW();  //调用双向增强函数
-    Invalidate();           //调用刷新函数
+    clearmem();
+    CDibNew1->ShuangXiangGROW();
+    Invalidate();
 }
 
 void CDynSplitView2::OnMosaic() // 马赛克

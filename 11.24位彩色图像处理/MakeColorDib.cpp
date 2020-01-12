@@ -591,36 +591,41 @@ void MakeColorDib::LowLVBObig()
 /*函数类型：void                                               */
 /*功能：使图像水平增强。                                       */
 /***************************************************************/
-void MakeColorDib::ShuiPingGROW()   //水平增强
+void MakeColorDib::ShuiPingGROW()
 {
-    BYTE *p_data;     //原图数据区指针
-    int wide,height,DibWidth;    //原图长、宽、字节宽
-    p_data=this->GetData ();   //取得原图的数据区指针
-    wide=this->GetWidth ();  //取得原图的数据区宽度
-    height=this->GetHeight ();   //取得原图的数据区高度
-    DibWidth=this->GetDibWidthBytes();   //取得原图的每行字节数
-    int h[3][1];//定义(3x1)矩阵
+    BYTE *p_data = this->GetData();  //取得原图的数据区指针
+    int width = this->GetWidth();    //取得原图的数据区宽度
+    int height = this->GetHeight();  //取得原图的数据区高度
+    int dibWidth = this->GetDibWidthBytes(); //取得原图的每行字节数
+
+    int size = dibWidth * height;
+    BYTE *p_temp = new BYTE[size];
+
+    int h[3][1]; //定义(3x1)矩阵
     h[0][0] = -1;  
     h[1][0] = 2; 
     h[2][0] = -1;
-    BYTE *p_temp=new BYTE[height*DibWidth];    // 暂时分配内存，以保存新图像
-    for(int j=0;j<height-2;j++)    // 每行
+
+    // 上下行像素对应相减
+    for (int y = 0; y < height - 2; y++) 
     {
-        for(int i=0;i<DibWidth-8;i++)    // 每列
+        for (int x = 0; x < dibWidth; x++)
         {
-            int pby_pt=0;
-            //对应的3行的值乘分别以矩阵对应值，再相加
-            pby_pt= h[0][0]*(*(p_data+(height-j-1)*DibWidth+i))
-                +h[1][0]*(*(p_data+(height-j-2)*DibWidth+i))
-                +h[2][0]*(*(p_data+(height-j-3)*DibWidth+i));
-            if(pby_pt>20)
-                *(p_temp+(height-j-2)*DibWidth+i)=abs(pby_pt)+100;
+            int temp = h[0][0] * p_data[dibWidth * y + x]
+                     + h[1][0] * p_data[dibWidth * (y + 1) + x]
+                     + h[2][0] * p_data[dibWidth * (y + 2) + x];
+
+            if (temp > 20)
+                temp = abs(temp) + 100;
             else
-                *(p_temp+(height-j-2)*DibWidth+i)=abs(pby_pt);
+                temp = abs(temp);
+
+            p_temp[dibWidth * y + x] = (temp > 255) ? 255 : temp;
         }
     }
-    memcpy(p_data,p_temp,height*DibWidth);  // 复制处理后的图像
-    delete []p_temp;  //删除暂时分配内存
+
+    memcpy(p_data, p_temp, size);
+    delete []p_temp;
 }
 
 /***************************************************************/
@@ -628,36 +633,43 @@ void MakeColorDib::ShuiPingGROW()   //水平增强
 /*函数类型：void                                               */
 /*功能：使图像垂直增强。                                       */
 /***************************************************************/
-void MakeColorDib::ChuiZhiGROW()   //垂直增强
+void MakeColorDib::ChuiZhiGROW()
 {
-    BYTE *p_data;     //原图数据区指针
-    int wide,height,DibWidth;    //原图长、宽、字节宽
-    p_data=this->GetData ();   //取得原图的数据区指针
-    wide=this->GetWidth ();  //取得原图的数据区宽度
-    height=this->GetHeight ();   //取得原图的数据区高度
-    DibWidth=this->GetDibWidthBytes();   //取得原图的每行字节数
-    int h[1][3];//定义(1x3)矩阵
+    int rgbChannel = (this->m_pBitmapInfoHeader->biBitCount == 24) ? 3 : 1;
+
+    BYTE *p_data = this->GetData();  //取得原图的数据区指针
+    int width = this->GetWidth();    //取得原图的数据区宽度
+    int height = this->GetHeight();  //取得原图的数据区高度
+    int dibWidth = this->GetDibWidthBytes(); //取得原图的每行字节数
+
+    int size = dibWidth * height;
+    BYTE *p_temp = new BYTE[size];
+
+    int h[1][3]; //定义(1x3)矩阵
     h[0][0] = -1; 
     h[0][1] = 2;
     h[0][2] = -1;
-    BYTE *p_temp=new BYTE[height*DibWidth];    // 暂时分配内存，以保存新图像
-    for(int j=0;j<height-2;j++)    // 每行
+
+    // 左右列像素对应相减
+    for (int y = 0; y < height; y++) 
     {
-        for(int i=0;i<DibWidth-8;i++)    // 每列
+        for (int x = 0; x < dibWidth - 2 * rgbChannel; x++)
         {
-            int pby_pt=0;
-            //对应的第0行的值乘以矩阵对应值，再相加
-            pby_pt= h[0][0]*(*(p_data+(height-j-1)*DibWidth+i))
-                +h[0][1]*(*(p_data+(height-j-1)*DibWidth+i+3))
-                +h[0][2]*(*(p_data+(height-j-1)*DibWidth+i+6));
-            if(pby_pt>20)
-                *(p_temp+(height-j-2)*DibWidth+i)=abs(pby_pt)+100;
+            int temp = h[0][0] * p_data[dibWidth * y + x]
+                     + h[0][1] * p_data[dibWidth * y + x + 1 * rgbChannel]
+                     + h[0][2] * p_data[dibWidth * y + x + 2 * rgbChannel];
+
+            if (temp > 20)
+                temp = abs(temp) + 100;
             else
-                *(p_temp+(height-j-2)*DibWidth+i)=abs(pby_pt);
+                temp = abs(temp);
+
+            p_temp[dibWidth * y + x] = (temp > 255) ? 255 : temp;
         }
     }
-    memcpy(p_data,p_temp,height*DibWidth);  // 复制处理后的图像
-    delete []p_temp;  //删除暂时分配内存
+
+    memcpy(p_data, p_temp, size);
+    delete []p_temp;
 }
 
 /***************************************************************/
@@ -667,42 +679,50 @@ void MakeColorDib::ChuiZhiGROW()   //垂直增强
 /***************************************************************/
 void MakeColorDib::ShuangXiangGROW()    //双向增强
 {
-    BYTE *p_data;     //原图数据区指针
-    int wide,height,DibWidth;    //原图长、宽、字节宽
-    p_data=this->GetData ();   //取得原图的数据区指针
-    wide=this->GetWidth ();  //取得原图的数据区宽度
-    height=this->GetHeight ();   //取得原图的数据区高度
-    DibWidth=this->GetDibWidthBytes();   //取得原图的每行字节数
-    int h[3][3];//定义(3x3)矩阵
+    int rgbChannel = (this->m_pBitmapInfoHeader->biBitCount == 24) ? 3 : 1;
+
+    BYTE *p_data = this->GetData();  //取得原图的数据区指针
+    int width = this->GetWidth();    //取得原图的数据区宽度
+    int height = this->GetHeight();  //取得原图的数据区高度
+    int dibWidth = this->GetDibWidthBytes(); //取得原图的每行字节数
+
+    int size = dibWidth * height;
+    BYTE *p_temp = new BYTE[size];
+
+    int h[3][3]; //定义(3x3)矩阵
     h[0][0] = -1;  h[0][1] = -1; h[0][2] = -1;
     h[1][0] = -1;  h[1][1] =  8; h[1][2] = -1;
     h[2][0] = -1;  h[2][1] = -1; h[2][2] = -1; 
-    BYTE *p_temp=new BYTE[height*DibWidth];    // 暂时分配内存，以保存新图像
-    for(int j=0;j<height-2;j++)    // 每行
-    {    
-        for(int i=0;i<DibWidth-8;i++)    // 每列
-        {
-            int pby_pt=0;
-            //对应的第0行的值乘以矩阵对应值，再相加
-            pby_pt= h[0][0]*(*(p_data+(height-j-1)*DibWidth+i))
-                +h[0][1]*(*(p_data+(height-j-1)*DibWidth+i+3))
-                +h[0][2]*(*(p_data+(height-j-1)*DibWidth+i+6))
+
+    for (int y = 0; y < height - 2; y++) 
+    {
+        for (int x = 0; x < dibWidth - 2 * rgbChannel; x++)
+        {     
+            int temp =
+                //对应的第0行的值乘以矩阵对应值，再相加
+                h[0][0] * p_data[dibWidth * y + x] 
+              + h[0][1] * p_data[dibWidth * y + x + 1 * rgbChannel]
+              + h[0][2] * p_data[dibWidth * y + x + 2 * rgbChannel]
                 //对应的第1行的值乘以矩阵对应值，再相加
-                +h[1][0]*(*(p_data+(height-j-2)*DibWidth+i))
-                +h[1][1]*(*(p_data+(height-j-2)*DibWidth+i+3))
-                +h[1][2]*(*(p_data+(height-j-2)*DibWidth+i+6))
+              + h[1][0] * p_data[dibWidth * (y + 1) + x]
+              + h[1][1] * p_data[dibWidth * (y + 1) + x + 1 * rgbChannel]
+              + h[1][2] * p_data[dibWidth * (y + 1) + x + 2 * rgbChannel]
                 //对应的第2行的值乘以矩阵对应值，再相加
-                +h[2][0]*(*(p_data+(height-j-3)*DibWidth+i))
-                +h[2][1]*(*(p_data+(height-j-3)*DibWidth+i+3))
-                +h[2][2]*(*(p_data+(height-j-3)*DibWidth+i+6));
-            if(pby_pt>20)
-                *(p_temp+(height-j-2)*DibWidth+i)=abs(pby_pt)+100;
-            else
-                *(p_temp+(height-j-2)*DibWidth+i)=abs(pby_pt);
+              + h[2][0] * p_data[dibWidth * (y + 2) + x]
+              + h[2][1] * p_data[dibWidth * (y + 2) + x + 1 * rgbChannel]
+              + h[2][2] * p_data[dibWidth * (y + 2) + x + 2 * rgbChannel];
+
+              if (temp > 20)
+                  temp = abs(temp) + 100;
+              else
+                  temp = abs(temp);
+
+              p_temp[dibWidth * y + x] = (temp > 255) ? 255 : temp;
         }
-    }    
-    memcpy(p_data,p_temp,height*DibWidth);  // 复制处理后的图像
-    delete []p_temp;  //删除暂时分配内存
+    }
+
+    memcpy(p_data, p_temp, size);
+    delete []p_temp;
 }
 
 /***************************************************************/
