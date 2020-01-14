@@ -194,54 +194,62 @@ void CDib::SaveFile(const CString filename)
     dibFile.Close();
 }
 
-
-void CDib::RGBtoGrade()
+void CDib::ToGrayBuf()
 { 
-    if(GetRGB())
-       m_pData2=m_pData;
-    else
-    {
-        BYTE r,g,b;
-        int height,wide,size;
-        height=GetHeight();
-        wide=GetWidth();
-        size=height*wide;
-        m_pData2=(BYTE*)GlobalAllocPtr(GMEM_MOVEABLE, size);
-        LONG lLineBytes =GetDibWidthBytes();
-        for(int j=0; j<height; j++)
-        {
-            for(int  i=0; i<wide; i++)
-            {
-                b=m_pData[j*lLineBytes+3*i];
-                g=m_pData[j*lLineBytes+3*i+1];
-                r=m_pData[j*lLineBytes+3*i+2];
-                m_pData2[j*wide+i]=(BYTE)(0.3*r+0.59*g+0.11*b);  
+    if(GetRGB()) {
+       m_pData2 = m_pData;
+    }
+    else { /// 将 24 位彩色图转换为 8 位灰度计算
+        BYTE r, g, b;
+        LONG rgbDibWidth, grayDibWidth;
+        int width, height, size;
+
+        width = GetWidth();
+        height = GetHeight();
+        rgbDibWidth = GetDibWidthBytes();
+
+        m_pBitmapInfoHeader->biBitCount = 8; // 24位 -> 8位
+        grayDibWidth = GetDibWidthBytes();
+        size = height * grayDibWidth;
+
+        m_pData2 = (BYTE *)GlobalAllocPtr(GMEM_MOVEABLE, size); // 重新分配内存
+        
+        for(int j = 0; j < height; j++) {
+            for(int i = 0; i < width; i++) {
+                b = m_pData[j * rgbDibWidth + 3 * i];
+                g = m_pData[j * rgbDibWidth + 3 * i + 1];
+                r = m_pData[j * rgbDibWidth + 3 * i + 2];
+                m_pData2[j * grayDibWidth + i] = (BYTE)((30 * r + 59 * g + 11 * b) / 100);  
             }
         }
     }
 }
 
-
-void CDib::GradetoRGB()
+void CDib::ToShowBuf()
 {
-    if(GetRGB())
-       m_pData2=m_pData;
-   else
-   {
-       BYTE r,g,b;
-        int height,wide;
-        height=GetHeight();
-        wide=GetWidth();
-        LONG lLineBytes =GetDibWidthBytes();
-        for(int j=0; j<height; j++)
-        {
-            for(int  i=0; i<wide; i++)
-            {
-                m_pData[(height-j-1)*lLineBytes+3*i]=m_pData2[(height-1-j)*wide+i];
-                m_pData[(height-j-1)*lLineBytes+3*i+1]=m_pData2[(height-1-j)*wide+i];
-                m_pData[(height-j-1)*lLineBytes+3*i+2]=m_pData2[(height-1-j)*wide+i];
-            
-            }
-        }
+   if(GetRGB()) {
+       m_pData = m_pData2;
+   }
+   else { /// 将 8 位灰度图转换为 24 位灰度显示
+       LONG rgbDibWidth, grayDibWidth;
+       int width, height, size;
+
+       width = GetWidth();
+       height=GetHeight();
+       grayDibWidth = GetDibWidthBytes();
+
+       m_pBitmapInfoHeader->biBitCount = 24; // 8位 -> 24位
+       rgbDibWidth = GetDibWidthBytes();
+       size = height * rgbDibWidth;
+
+       //m_pData = (BYTE*)GlobalAllocPtr(GMEM_MOVEABLE, size);
+
+       for(int j = 0; j < height; j++) {
+           for(int i = 0; i < width; i++) {
+               m_pData[(height-j-1) * rgbDibWidth+3*i]   = m_pData2[(height-1-j) * grayDibWidth+i];
+               m_pData[(height-j-1) * rgbDibWidth+3*i+1] = m_pData2[(height-1-j) * grayDibWidth+i];
+               m_pData[(height-j-1) * rgbDibWidth+3*i+2] = m_pData2[(height-1-j) * grayDibWidth+i];
+           }
+       }
    }
 }

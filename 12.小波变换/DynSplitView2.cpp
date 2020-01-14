@@ -18,8 +18,9 @@ static char THIS_FILE[] = __FILE__;
 IMPLEMENT_DYNCREATE(CDynSplitView2, CView)
 
 CDynSplitView2::CDynSplitView2()
-{state2=0;
-n=0;
+{
+    state2=0;
+    n=0;
 }
 
 
@@ -97,10 +98,8 @@ void CDynSplitView2::OnDraw(CDC* pDC)
     CDSplitDoc* pDoc = GetDocument();
     ASSERT_VALID(pDoc);
     
-    if(!pDoc ->statedoc&&state2==1)
+    if(!pDoc->statedoc && state2==1)
     {
-             
-
         BYTE* pBitmapData = CDibNew1->GetData();
         LPBITMAPINFO pBitmapInfo = CDibNew1->GetInfo();
         int bitmapHeight = CDibNew1->GetHeight();
@@ -121,18 +120,14 @@ void CDynSplitView2::OnDraw(CDC* pDC)
             hPalette.DeleteObject();
         }
         else
-        {
-            
+        { 
             ::StretchDIBits(pDC->GetSafeHdc(),
                 0, 0, scaledWidth, scaledHeight,
                 0, 0, bitmapWidth, bitmapHeight,
                 pBitmapData, pBitmapInfo,
                 DIB_RGB_COLORS, SRCCOPY);
-        
         }
     }
-
-
 }
 
 
@@ -164,36 +159,34 @@ BOOL CDynSplitView2::OnEraseBkgnd(CDC* pDC)
 
 void CDynSplitView2::OnFilesave() 
 {
-/*    CFileDialog dlg(FALSE,_T("BMP"),_T("*.BMP"),OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT,_T("位图文件(*.BMP)|*.BMP|"));    
+    CFileDialog dlg(FALSE,_T("BMP"),_T("*.BMP"),OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT,_T("位图文件(*.BMP)|*.BMP|"));    
     if(IDOK==dlg.DoModal())
-    CString  filename;
-    filename.Format ("%s",dlg.GetPathName() );    
-    CDibNew1->SaveFile(filename);
-    state2=1;
-    Invalidate();
-*/
+    {
+        CString  filename;
+        filename.Format ("%s",dlg.GetPathName());    
+        CDibNew1->SaveFile(filename);
+        state2=1;
+    }
 }
 
 void CDynSplitView2::clearmem2()
 {
     CDSplitDoc* pDoc = GetDocument();
     ASSERT_VALID(pDoc);
-    pDoc ->statedoc=0;
+    pDoc->statedoc=0;
     state2=1;
 
     CDibNew1=&pDoc->CDibNew;
     CDib1=&pDoc->CDib;
-    long int  size=CDib1->GetHeight()*CDib1->GetWidth();
-   memcpy(CDibNew1->m_pData2,CDib1->m_pData2,size);//复制原图像到处理区
-
+    long int size=CDibNew1->GetHeight()*CDibNew1->GetDibWidthBytes();
+    memcpy(CDibNew1->m_pData2,CDib1->m_pData2,size);//复制原图像到处理区
 }
 
 void CDynSplitView2::OnHangbianhuan() 
 {
     clearmem2();
     CDibNew1->Hangbianhuan();
-    CDibNew1->GradetoRGB();
-
+    CDibNew1->ToShowBuf();
     Invalidate();
 }
 
@@ -201,7 +194,7 @@ void CDynSplitView2::OnLiebianhuan()
 {
     clearmem2();
     CDibNew1->Liebianhuan();
-    CDibNew1->GradetoRGB();
+    CDibNew1->ToShowBuf();
     Invalidate();    
 }
 
@@ -210,7 +203,7 @@ void CDynSplitView2::OnOnce()
     clearmem2();
     n=1;
     CDibNew1->Once(n);
-    CDibNew1->GradetoRGB();
+    CDibNew1->ToShowBuf();
     Invalidate();        
 }
 
@@ -219,7 +212,7 @@ void CDynSplitView2::OnTwice()
     clearmem2();
     n=2;
     CDibNew1->Once(n);
-    CDibNew1->GradetoRGB();
+    CDibNew1->ToShowBuf();
     Invalidate();    
 }
 
@@ -228,7 +221,7 @@ void CDynSplitView2::OnThrice()
     clearmem2();
     n=3;
     CDibNew1->Once(n);
-    CDibNew1->GradetoRGB();
+    CDibNew1->ToShowBuf();
     Invalidate();
 }
 
@@ -240,17 +233,14 @@ void CDynSplitView2::OnLowfilter()
     if(IDOK==dlg.DoModal())
         n=dlg.m_Num ;
     CDibNew1->LowFilter(n);
-    CDibNew1->GradetoRGB();
+    CDibNew1->ToShowBuf();
     Invalidate();
-    
-
 }
 
 void CDynSplitView2::OnIdwt() 
 {
-
     CDibNew1->IDWT(n);
-    CDibNew1->GradetoRGB();
+    CDibNew1->ToShowBuf();
     Invalidate();
 }
 
@@ -262,6 +252,6 @@ void CDynSplitView2::OnHighfilter()
     if(IDOK==dlg.DoModal())
         n=dlg.m_Num ;
     CDibNew1->HighFilter(n);
-    CDibNew1->GradetoRGB();
+    CDibNew1->ToShowBuf();
     Invalidate();    
 }

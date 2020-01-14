@@ -91,8 +91,8 @@ void CDSplitDoc::OnFileopen()
         filename.Format ("%s",dlg.GetPathName() );    
         CDib.LoadFile(filename);
         CDibNew.LoadFile(filename);
-        CDib.RGBtoGrade();
-        CDibNew.RGBtoGrade();
+        CDib.ToGrayBuf();
+        CDibNew.ToGrayBuf();
         statedoc=1;
     }
 }

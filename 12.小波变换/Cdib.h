@@ -38,10 +38,9 @@ public:
     void SaveFile(const CString filename);
 
 public:
-    void GradetoRGB();
-    void RGBtoGrade();
-    void LoadFile(const char* dibFileName);
-    
+    void ToShowBuf();
+    void ToGrayBuf();
+    void LoadFile(const char* dibFileName);  
 };
 
 #endif

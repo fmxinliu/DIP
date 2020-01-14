@@ -37,48 +37,37 @@ CWvltTransDib::~CWvltTransDib()
 *********************************************************************************/
 void CWvltTransDib::Hangbianhuan()
 {
-    int i,j;
-    LONG wide,height;
-    LPBYTE temp1,m_pData2;
+    BYTE *p_data = this->GetData2(); //取得原图的数据区指针
+    int width = this->GetWidth();    //取得原图的数据区宽度
+    int height = this->GetHeight();  //取得原图的数据区高度
+    int dibWidth = this->GetDibWidthBytes(); //取得原图的每行字节数
 
-    wide=this->GetWidth();
-    height=this->GetHeight();
-    m_pData2=this->GetData2();
-
-    int nWide=wide/2;
-
-    //分配临时数据空间
-    temp1 = new BYTE[height*wide];
+    int size = dibWidth * height;
+    BYTE *p_temp = new BYTE[size];
+    int halfWidth = width / 2;
 
     //从设备缓存中获得原始图像数据
-    for(j = 0; j < height; j ++)            
+    for (int y = 0; y < height; y++)
     {
-        for(i = 0; i < nWide; i ++)           
+        for (int x = 0; x < halfWidth; x++)
         {
-            int w = i *2;
-            temp1[j*wide+i] = m_pData2[j*wide+w];        //偶
-            temp1[j*wide+nWide+i] = m_pData2[j*wide+w+1];    //奇
+            p_temp[dibWidth * y + x] = p_data[dibWidth * y + x * 2]; // 左偶
+            p_temp[dibWidth * y + halfWidth + x] = p_data[dibWidth * y + x * 2 + 1]; // 右奇
         }
     }
+
     //通过图像的差分，完成小波变换
-    for(j=0; j<height; j++)
+    for (int y = 0; y < height; y++)
     {
-        for(i=0; i<nWide-1; i++)
+        for (int x = 0; x < halfWidth; x++)
         {
-            temp1[j*wide+nWide-1+i] =temp1[j*wide+(nWide-1)+i] - temp1[j*wide+i]+128;    
+            p_temp[dibWidth * y + halfWidth + x] -= p_temp[dibWidth * y + x] + 128;
         }
     }
 
     //小波经过处理后，放入显示缓存中
-    for(j=0; j<(int)height; j++)
-    {
-        for(i=0; i<(int)wide; i++)
-        {
-            m_pData2[j*wide+i]  = temp1[j*wide+i];
-        }
-    }
-    //删除临时的数据空间
-    delete temp1;
+    memcpy(p_data, p_temp, size);
+    delete []p_temp;
 }
 
 /********************************************************************************
