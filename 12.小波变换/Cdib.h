@@ -1,6 +1,8 @@
 #ifndef __CDIB_H
 #define __CDIB_H
 
+#define WIDTHBYTES(bits)    (((bits) + 31) / 32 * 4) 
+
 class CDib : public CObject
 {
 public:

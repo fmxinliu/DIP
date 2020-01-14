@@ -2,7 +2,7 @@
 #include "cdib.h"
 #include "windowsx.h"
 #include "math.h"
-#define WIDTHBYTES(bits)    (((bits) + 31) / 32 * 4) 
+
 
 CDib::CDib()
 {
@@ -209,7 +209,7 @@ void CDib::ToGrayBuf()
         rgbDibWidth = GetDibWidthBytes();
 
         m_pBitmapInfoHeader->biBitCount = 8; // 24位 -> 8位
-        grayDibWidth = GetDibWidthBytes();
+        grayDibWidth = WIDTHBYTES(width * 8);
         size = height * grayDibWidth;
 
         m_pData2 = (BYTE *)GlobalAllocPtr(GMEM_MOVEABLE, size); // 重新分配内存
@@ -236,7 +236,7 @@ void CDib::ToShowBuf()
 
        width = GetWidth();
        height=GetHeight();
-       grayDibWidth = GetDibWidthBytes();
+       grayDibWidth = WIDTHBYTES(width * 8);
 
        m_pBitmapInfoHeader->biBitCount = 24; // 8位 -> 24位
        rgbDibWidth = GetDibWidthBytes();

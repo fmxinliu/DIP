@@ -178,8 +178,8 @@ void CDynSplitView2::clearmem2()
 
     CDibNew1=&pDoc->CDibNew;
     CDib1=&pDoc->CDib;
-    long int size=CDibNew1->GetHeight()*CDibNew1->GetDibWidthBytes();
-    memcpy(CDibNew1->m_pData2,CDib1->m_pData2,size);//复制原图像到处理区
+    long int size=CDib1->GetHeight() * WIDTHBYTES(CDib1->GetWidth() * 8);
+    memcpy(CDibNew1->m_pData2, CDib1->m_pData2, size); // 复制原图像到处理区
 }
 
 void CDynSplitView2::OnHangbianhuan() 

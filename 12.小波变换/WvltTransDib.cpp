@@ -40,7 +40,7 @@ void CWvltTransDib::Hangbianhuan()
     BYTE *p_data = this->GetData2(); //取得原图的数据区指针
     int width = this->GetWidth();    //取得原图的数据区宽度
     int height = this->GetHeight();  //取得原图的数据区高度
-    int dibWidth = this->GetDibWidthBytes(); //取得原图的每行字节数
+    int dibWidth = WIDTHBYTES(width * 8); //取得原图的每行字节数
 
     int size = dibWidth * height;
     BYTE *p_temp = new BYTE[size];
@@ -51,8 +51,8 @@ void CWvltTransDib::Hangbianhuan()
     {
         for (int x = 0; x < halfWidth; x++)
         {
-            p_temp[dibWidth * y + x] = p_data[dibWidth * y + x * 2]; // 左偶
-            p_temp[dibWidth * y + halfWidth + x] = p_data[dibWidth * y + x * 2 + 1]; // 右奇
+            p_temp[dibWidth * y + x] = p_data[dibWidth * y + x * 2]; // 偶 -》 左
+            p_temp[dibWidth * y + halfWidth + x] = p_data[dibWidth * y + x * 2 + 1]; // 奇 -》 右
         }
     }
 
@@ -61,7 +61,7 @@ void CWvltTransDib::Hangbianhuan()
     {
         for (int x = 0; x < halfWidth; x++)
         {
-            p_temp[dibWidth * y + halfWidth + x] -= p_temp[dibWidth * y + x] + 128;
+            p_temp[dibWidth * y + halfWidth + x] -= p_temp[dibWidth * y + x] + 128; // 奇 - 偶 -》 右
         }
     }
 
@@ -73,45 +73,41 @@ void CWvltTransDib::Hangbianhuan()
 /********************************************************************************
 *函数描述：    Liebianhuan实现小波列变换
 *函数参数：    无 
-*函数返回值：函数无返回值                          
+*函数返回值：函数无返回值（注意：图像上、下颠倒）                          
 *********************************************************************************/
 void CWvltTransDib::Liebianhuan()
 {
-    int i,j;
-    LONG wide,height;
-    LPBYTE  temp,m_pData2;
-    wide=this->GetWidth();
-    height=this->GetHeight();
-    m_pData2=this->GetData2();
-    int nHeight=height/2;
-    //分配临时数据空间
-    temp = new BYTE[height*wide];
-    for(i = 0; i < wide; i ++)            
+    BYTE *p_data = this->GetData2(); //取得原图的数据区指针
+    int width = this->GetWidth();    //取得原图的数据区宽度
+    int height = this->GetHeight();  //取得原图的数据区高度
+    int dibWidth = WIDTHBYTES(width * 8); //取得原图的每行字节数
+
+    int size = dibWidth * height;
+    BYTE *p_temp = new BYTE[size];
+    int halfHeight = height / 2;
+
+    //从设备缓存中获得原始图像数据
+    for (int x = 0; x < width; x++)
     {
-        for(j = 0; j < nHeight; j ++)           
+        for (int y = 0; y < halfHeight; y++)
         {
-            int h = j *2 ;
-            temp[j*wide+i] = m_pData2[h*wide+i];        //even
-            temp[(nHeight + j)*wide+i] = m_pData2[(h+1)*wide+i];    //odd
+            p_temp[dibWidth * (y) + x] = p_data[dibWidth * (y * 2) + x]; // 偶 -》 下
+            p_temp[dibWidth * (y + halfHeight) + x] = p_data[dibWidth * (y * 2 + 1) + x]; // 奇 -》 上
         }
     }
+
     //通过图像的差分，完成小波变换
-    for(i=0; i<wide; i++)
+    for (int x = 0; x < width; x++)
     {
-        for(j=0; j<nHeight-1; j++)
+        for (int y = 0; y < halfHeight - 1; y++)
         {
-            temp[ j*wide+i]=temp[(nHeight + j)*wide+i]- temp[j*wide+i]+128;
+            p_temp[dibWidth * (y) + x] -= p_temp[dibWidth * (y + halfHeight) + x] + 128; // 偶 - 奇 -》 下
         }
     }
-    for(j=0; j<(int)height; j++)
-    {
-        for(i=0; i<(int)wide; i++)
-        {
-            m_pData2[j*wide+i]  = temp[j*wide+i];
-        }
-    }
-    //删除临时的数据空间
-    delete temp;    
+
+    //小波经过处理后，放入显示缓存中
+    memcpy(p_data, p_temp, size);
+    delete []p_temp; 
 }
 
 
